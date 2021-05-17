@@ -103,3 +103,4 @@ def add_sentense(**kwards):
 
 db_session.global_init("db/users_my_site.db")
 add_complaint(name='Дорога', description='fjgfkmfgk', coordinates='44, 36', category='ЖКХ')
+
