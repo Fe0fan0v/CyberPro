@@ -1,3 +1,3 @@
-from data.users import *
-from data.complaints import *
-from data.thanks import *
+from users import *
+from complaints import *
+from thanks import *
