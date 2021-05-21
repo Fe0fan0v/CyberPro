@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="hight: 100%; width: 100%; align: center;">
+<h1 style="position: absolute; top: 12%; left: 43%; font-weight: bold;">Карта проблем</h1>
+<div id="map" style="width: 100%; height: 900px; padding: 20%;"></div>
+<div style="position: absolute; left: 40%; top: 20%;"><input type="radio" class="btn-check" name="options" id="option1" autocomplete="off" checked>
+<label class="btn btn-outline-danger" for="option1">Checked</label>
+
+<input type="radio" class="btn-check" name="options" id="option2" autocomplete="off">
+<label class="btn btn-outline-danger" for="option2">Radio</label>
+
+<input type="radio" class="btn-check" name="options" id="option3" autocomplete="off">
+<label class="btn btn-outline-danger" for="option3" >Disabled</label>
+
+<input type="radio" class="btn-check" name="options" id="option4" autocomplete="off">
+    <label class="btn btn-outline-danger" for="option4" >Radio</label></div></div>
+<script src="http://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+<script type="text/javascript">
+ymaps.ready(init);
+
+function init () {
+    var myMap = new ymaps.Map("map", {
+        // Центр карты, указываем коордианты
+        center:[55.061789, 60.107030],
+        // Масштаб, тут все просто
+        zoom: 9,
+        // Отключаем все элементы управления
+        controls: ['zoomControl']
+    });
+
+    var myGeoObjects = [];
+
+    // Наша метка, указываем коордианты
+    {% for i in list_problems %}
+        myGeoObjects[{{ loop.index - 1 }}] = new ymaps.Placemark([{{ i['lat'] }}, {{ i['lon'] }}],{
+                        balloonContentHeader: '<a href = "#">{{ i['name'] }}</a><br>' +
+                        '<span style="color: {{ i['color'] }};">{{ i['category'] }} проблема</span>',
+                        {% if i['flag'] == True %}
+                        balloonContentBody: '<img src="static/img/broken_road.jpg" height="135" width="180"> <br/> ' +
+                        '<img src="static/img/verified.png" height="32" width="150"> <br/> ',
+                        balloonContentFooter: 'Проблема обнародована:<br/> {{ i['date'] }}',}
+                        {% else %}
+                        balloonContentBody: '<img src="static/img/broken_road.jpg" height="135" width="180"> <br/> ',
+                        balloonContentFooter: 'Проблема обнародована:<br/> {{ i['date'] }}',}
+                        {% endif %}
+                        ,{
+                        iconLayout: 'default#image',
+                        // Путь до нашей картинки
+                        iconImageHref: 'static/img/{{ i['label'] }}',
+                        // Размер по ширине и высоте
+                        iconImageSize: [50, 50],
+                        // Смещение левого верхнего угла иконки относительно
+                        // её «ножки» (точки привязки).
+                        iconImageOffset: [-25, -45]
+    });
+    {% endfor %}
+    var clusterer = new ymaps.Clusterer({
+        clusterDisableClickZoom: false,
+        clusterOpenBalloonOnClick: false,
+    });
+
+    clusterer.add(myGeoObjects);
+    myMap.geoObjects.add(clusterer);
+
+}
+</script>
+{% endblock %}
