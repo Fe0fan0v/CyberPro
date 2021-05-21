@@ -43,7 +43,7 @@ def write_to_file(data, filename):
 
 
 def add_complaint(**kwards):
-    print(9)
+    db_session.global_init("db/users_my_site.db")
     db_sess = db_session.create_session()
     for i in ['name', 'description', 'coordinates', 'photo']:
         if i not in list(kwards.keys()):
