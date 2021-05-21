@@ -7,6 +7,7 @@ import logging
 import telebot
 import time
 import os
+from main import add_complaint
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 bot = telebot.TeleBot('1813697722:AAHP7kjaJrZ5iMOSxnUgX_nmYT5LBMTd-0A')
@@ -86,7 +87,7 @@ def asc_location(message):
 def location(message):
     if message.location:
         try:
-            output_data["pos"] = message.location
+            output_data["pos"] = (message.location.latitude, message.location.longitude)
         except Exception as error_message:
             logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
 
@@ -109,12 +110,12 @@ def welcome(message):
     try:
         write_message(message, '!!! надо написать формы !!!')
     except Exception as error_message:
-        logging.error(error_message + "  ┋  " + time.ctime() + "\n")
+        logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
 
 
 @bot.message_handler(content_types=['text', 'photo'])
 def start(message):
-    global is_complain
+    global is_complain, output_data
     try:
         if message.text:
             ms = message.text.lower()
@@ -139,7 +140,12 @@ def start(message):
         elif is_complain:
             is_complain = False
             output_data["complaint"] = ms
-
+        if output_data:
+            print(output_data)
+            if "pos" in list(output_data.keys()) and "image-bite" in list(output_data.keys()) and "complaint" in list(output_data.keys()):
+                add_complaint(coordinates=f'{output_data["pos"][0]},{output_data["pos"][1]}', name=output_data['complaint'], description=output_data['complaint'], photo=output_data['image-bite'])
+                output_data = {}
+                print(9)
     except Exception as error_message:
         logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
 

@@ -43,10 +43,12 @@ def write_to_file(data, filename):
 
 
 def add_complaint(**kwards):
+    print(9)
     db_sess = db_session.create_session()
     for i in ['name', 'description', 'coordinates', 'photo']:
         if i not in list(kwards.keys()):
             return
+    print(kwards)
     for i in db_sess.query(Complaint).all():
         if lonlat_distance((float(kwards['coordinates'].split(',')[0]), float(kwards['coordinates'].split(',')[1])),
                            (float(i.coordinates.split(',')[0]), float(i.coordinates.split(',')[1]))) <= 20:
@@ -115,12 +117,12 @@ def add_sentense(**kwards):
     return
 
 
-def city():
-    g = geocoder.ip('me')
-    print(g.city)
+# def city():
+#     g = geocoder.ip('me')
+#     print(g.city)
 
 
-city()
+# city()
 #db_session.global_init("db/users_my_site.db")
 #add_complaint(name='Прорвало трубы', description='В подъезде вода...',
 #              photo=convert_to_binary_data('static/img/broken_road.jpg'),
