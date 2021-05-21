@@ -1,9 +1,11 @@
-from flask import redirect, render_template, Flask
+from flask import redirect, render_template, Flask, request, jsonify
 from data.register import RegisterForm
 from data.login_form import LoginForm
-from flask_login import login_user, LoginManager, login_required, logout_user
+from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from data import db_session
 from data.users import User
+from data.complaints import Complaint
+from constants import *
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'ryasov_secret_key'
@@ -64,7 +66,50 @@ def logout():
 
 @app.route('/')
 def index():
-    return render_template('base.html', title='Главная')
+    db_sess = db_session.create_session()
+    list_problems = []
+    for i in db_sess.query(Complaint).all():
+        if i.n_confirmation >= 5:
+            flag = True
+        else:
+            flag = False
+        diction = {}
+        diction['id'] = i.id
+        diction['name'] = i.name
+        diction['lat'] = i.coordinates.split(',')[0]
+        diction['lon'] = i.coordinates.split(',')[1]
+        diction['date'] = i.modifed_date
+        diction['category'] = i.category
+        diction['ver'] = flag
+        diction['color'] = DICT_COLORS_PROBLEMS[i.category]
+        diction['label'] = DICT_COLORS_LABELS[i.category]
+        list_problems.append(diction)
+    return render_template('geolocation.html', title='Главная', list_problems=list_problems)
+
+
+@app.route('/c', methods=["GET"])
+def co():
+    db_sess = db_session.create_session()
+    list_problems = []
+    for i in db_sess.query(Complaint).all():
+        if i.n_confirmation >= 5:
+            flag = True
+        else:
+            flag = False
+        diction = {}
+        diction['id'] = i.id
+        diction['name'] = i.name
+        diction['text'] = i.description
+        diction['lat'] = i.coordinates.split(',')[0]
+        diction['lon'] = i.coordinates.split(',')[1]
+        diction['date'] = i.modifed_date
+        diction['category'] = i.category
+        diction['ver'] = flag
+        diction['color'] = DICT_COLORS_PROBLEMS[i.category]
+        diction['label'] = DICT_COLORS_LABELS[i.category]
+        list_problems.append(diction)
+    print(request.remote_addr)
+    return render_template('problems.html', list_problems=list_problems)
 
 
 if __name__ == '__main__':
