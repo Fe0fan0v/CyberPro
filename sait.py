@@ -66,6 +66,7 @@ def logout():
 
 @app.route('/')
 def index():
+    db_session.global_init("db/users_my_site.db")
     db_sess = db_session.create_session()
     list_problems = []
     for i in db_sess.query(Complaint).all():

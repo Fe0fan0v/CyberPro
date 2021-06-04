@@ -87,7 +87,9 @@ def create_output_data():
             output_data["Description"] = before_output_data[2]
             output_data["Bite-photo"] = before_output_data[3]
             output_data["Date"] = before_output_data[4]
-            output_data["Location"] = before_output_data[5]
+            locate = str(before_output_data[5])[13:-1].split(", 'latitude': ")
+            locate = (locate[0].strip(), locate[1].strip())
+            output_data["Location"] = locate
             output_data["Type"] = before_output_data[6]
         elif before_output_data[0] == "Gratitude":
             output_data["Name"] = before_output_data[1]
@@ -104,11 +106,11 @@ def create_output_data():
         else:
             return
         if before_output_data[0] == "Complain":
-            if ["Bite-photo", "Description", "Location", "Name"] == list(output_data.keys()).sort():
-                add_complaint(coordinates=f'{output_data["Location"][0]},{output_data["Location"][1]}',
-                              name=output_data["Name"], description=output_data["Description"],
-                              photo=output_data["Bite-photo"], date=output_data["Date"])
-                output_data = {}
+            # if ["Bite-photo", "Description", "Location", "Name"] == list(output_data.keys()).sort():
+            add_complaint(coordinates=f'{output_data["Location"][0]},{output_data["Location"][1]}',
+                          name=output_data["Name"], description=output_data["Description"],
+                          photo=output_data["Bite-photo"], date=output_data["Date"])
+            output_data = {}
         elif before_output_data[0] == "Gratitude":
             if ["Bite-photo", "Description", "Name"] == list(output_data.keys()).sort():
                 add_thanks(coordinates=f'{output_data["Location"][0]},{output_data["Location"][1]}',
@@ -293,9 +295,7 @@ def start(message):
 bot.polling(none_stop=True, interval=0)
 
 """
-
 1) Вставить это в описание бота:
     Здравствуйте! Этот бот создан для отправки жалоб, предложений и благодарностей.\n 
     Если вы хотите узнать форму отправки для каждого вида сообщения, напишите /help
-
 """

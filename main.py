@@ -43,16 +43,19 @@ def write_to_file(data, filename):
 
 
 def add_complaint(**kwards):
+    db_session.global_init("db/users_my_site.db")
     db_sess = db_session.create_session()
     for i in ['name', 'description', 'coordinates', 'photo', 'date']:
         if i not in list(kwards.keys()):
             return
+    print(6)
     for i in db_sess.query(Complaint).all():
         if lonlat_distance((float(kwards['coordinates'].split(',')[0]), float(kwards['coordinates'].split(',')[1])),
                            (float(i.coordinates.split(',')[0]), float(i.coordinates.split(',')[1]))) <= 20:
             i.n_confirmation += 1
             db_sess.commit()
             return
+    print(7)
     if 'category' not in list(kwards.keys()):
         complaint = Complaint(
             name=kwards['name'],
@@ -106,14 +109,14 @@ def add_sentense(**kwards):
     else:
         category = kwards['category']
     sentense = Sentense(name=kwards['name'],
-        description=kwards['description'],
-        file=kwards['file'],
-        category=category,
-    )
+                        description=kwards['description'],
+                        file=kwards['file'],
+                        category=category,
+                        )
     db_sess.add(sentense)
     db_sess.commit()
     return
-#db_session.global_init("db/users_my_site.db")
-#add_complaint(name='Прорвало трубы', description='В подъезде вода...',
+# db_session.global_init("db/users_my_site.db")
+# add_complaint(name='Прорвало трубы', description='В подъезде вода...',
 #              photo=convert_to_binary_data('static/img/broken_road.jpg'),
 #              coordinates='54.9792438711978,60.36213526917058', category='ЖКХ')
