@@ -3,6 +3,20 @@ from data.complaints import Complaint
 from data.thanks import Thank
 from data.sentenses import Sentense
 import os
+import geocoder
+import math
+
+
+def lonlat_distance(a, b):
+    degree_to_meters_factor = 111 * 1000
+    a_lon, a_lat = a
+    b_lon, b_lat = b
+    radians_lattitude = math.radians((a_lat + b_lat) / 2.)
+    lat_lon_factor = math.cos(radians_lattitude)
+    dx = abs(a_lon - b_lon) * degree_to_meters_factor * lat_lon_factor
+    dy = abs(a_lat - b_lat) * degree_to_meters_factor
+    distance = math.sqrt(dx * dx + dy * dy)
+    return int(distance)
 
 
 def convert_to_binary_data(filename):
@@ -30,13 +44,13 @@ def write_to_file(data, filename):
 
 def add_complaint(**kwards):
     db_sess = db_session.create_session()
-    for i in ['name', 'description', 'coordinates', 'photo']:
+    for i in ['name', 'description', 'coordinates', 'photo', 'date']:
         if i not in list(kwards.keys()):
             return
     for i in db_sess.query(Complaint).all():
-        if kwards['coordinates'] == i.coordinates:
-            complaint = db_sess.query(Complaint).filter(Complaint.coordinates == kwards['coordinates']).first()
-            complaint.n_confirmation += 1
+        if lonlat_distance((float(kwards['coordinates'].split(',')[0]), float(kwards['coordinates'].split(',')[1])),
+                           (float(i.coordinates.split(',')[0]), float(i.coordinates.split(',')[1]))) <= 20:
+            i.n_confirmation += 1
             db_sess.commit()
             return
     if 'category' not in list(kwards.keys()):
@@ -84,14 +98,14 @@ def add_thanks(**kwards):
 
 def add_sentense(**kwards):
     db_sess = db_session.create_session()
-    for i in ['description', 'file']:
+    for i in ['description', 'file', 'name']:
         if i not in list(kwards.keys()):
             return
     if 'category' not in list(kwards.keys()):
         category = 'Другое'
     else:
         category = kwards['category']
-    sentense = Sentense(
+    sentense = Sentense(name=kwards['name'],
         description=kwards['description'],
         file=kwards['file'],
         category=category,
@@ -99,8 +113,7 @@ def add_sentense(**kwards):
     db_sess.add(sentense)
     db_sess.commit()
     return
-
-
-db_session.global_init("db/users_my_site.db")
-add_complaint(name='Дорога', description='fjgfkmfgk', coordinates='44, 36', category='ЖКХ')
-
+#db_session.global_init("db/users_my_site.db")
+#add_complaint(name='Прорвало трубы', description='В подъезде вода...',
+#              photo=convert_to_binary_data('static/img/broken_road.jpg'),
+#              coordinates='54.9792438711978,60.36213526917058', category='ЖКХ')

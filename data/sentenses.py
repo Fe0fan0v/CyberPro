@@ -8,6 +8,7 @@ from data.db_session import SqlAlchemyBase
 class Sentense(SqlAlchemyBase, UserMixin, SerializerMixin):
     __tablename__ = 'sentenses'
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     description = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     category = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     file = sqlalchemy.Column(sqlalchemy.BLOB, nullable=True)
