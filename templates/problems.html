@@ -4,6 +4,20 @@
     <meta charset="UTF-8">
     <div style="position: absolute; top: 6%; left:25%; width: 50%; color: white;
     border: 4px solid black; padding: 10px; background-color: rgb(28, 28, 28); font-size: large; height: 400%">
+        <form method="post"><div>
+            <input type="radio" class="btn-check" name="options" id="option1" value="0" checked autocomplete="off">
+            <label class="btn btn-secondary" for="option1">По новизне</label>
+
+            <input type="radio" class="btn-check" name="options" id="option2" value="1" autocomplete="off">
+            <label class="btn btn-secondary" for="option2">По актуальности</label>
+
+            <select class="form-select" aria-label="Default select example" name="region">
+                <option selected value="все">Все регионы</option>
+                {% for i in lst_regions %}
+                <option value="{{ i }}">{{ i }}</option>
+                {% endfor %}
+            </select><input class="btn btn-primary" type="submit" value="Перестроить" name="submit_button">
+        </div></form>
         {% for i in list_problems %}
         <section>
             <article class="cell">
@@ -11,18 +25,30 @@
                     <h3>
                         <a>{{ i['name'] }}</a>
                     </h3>
-                    <div>
+                    <!-- <div>
                         <div>{{ i['description'] }}</div>
+                    </div> -->
+                    <div>
+                        <div style="color: {{ i['color'] }}">{{ i['category'] }} проблема</div>
                     </div>
                     <div>
-                        <div>"дата"</div>
+                        <div>Опубликована: {{ i['date'] }}</div>
                     </div>
                     <div>
-                        <div>"фото"</div>
+                        <img src="../static/img/img_problems/{{ i['id'] }}.jpg" style="text-align: center;" height="50%" width="50%">
                     </div>
                     <div>
-                        <div>Описание</div>
+                        <div style="text-align: left; padding: 10px 40px;">  {{ i['text'] }}</div>
                     </div>
+                    {% if i['ver'] == True %}
+                        <div>
+                        <img src="../static/img/verified.png" style="text-align: center;" height="50%" width="50%">
+                    </div>
+                    {% endif %}
+                    <form method="post">
+                    <input type="checkbox" class="btn-check" name="problem" id="btn-check-outlined{{ i['id'] }}" value="{{ i['id'] }}" autocomplete="off" style="opacity: 0;">
+                    <label class="btn btn-outline-primary" for="btn-check-outlined{{ i['id'] }}" >Подтвердить</label></form>
+
                 </div>
             </article>
         </section>

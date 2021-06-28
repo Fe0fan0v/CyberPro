@@ -6,6 +6,9 @@ from data import db_session
 from data.users import User
 from data.complaints import Complaint
 from constants import *
+from main import write_to_file, geocode
+import os
+import operator
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'ryasov_secret_key'
@@ -36,11 +39,12 @@ def reqister():
             name=form.name.data,
             surname=form.surname.data,
             email=form.email.data,
+            id_tele=form.id_tele.data
         )
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
-        return redirect('/')
+        return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form)
 
 
@@ -64,9 +68,14 @@ def logout():
     return redirect("/")
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    db_session.global_init("db/users_my_site.db")
+    db_session.global_init("db/site_db.db")
+    user_answer = '4'
+    if request.method == 'POST':
+        if 'submit_button' in request.form:
+            user_answer = request.form['category']
+            print(user_answer)
     db_sess = db_session.create_session()
     list_problems = []
     for i in db_sess.query(Complaint).all():
@@ -84,12 +93,33 @@ def index():
         diction['ver'] = flag
         diction['color'] = DICT_COLORS_PROBLEMS[i.category]
         diction['label'] = DICT_COLORS_LABELS[i.category]
+        if user_answer == '0' and diction['category'] == 'Дорожная':
+            pass
+        elif user_answer == '1' and diction['category'] == 'Экологическая':
+            pass
+        elif user_answer == '2' and diction['category'] == 'ЖКХ':
+            pass
+        elif user_answer == '3' and diction['category'] == 'Другое':
+            pass
+        elif user_answer == '4':
+            pass
+        else:
+            continue
         list_problems.append(diction)
     return render_template('geolocation.html', title='Главная', list_problems=list_problems)
 
 
-@app.route('/c', methods=["GET"])
+@app.route('/c', methods=["GET", 'POST'])
 def co():
+    flag_date = True
+    region = 'все'
+    if request.method == "POST" and 'submit_button' in request.form:
+        region = request.form['region']
+        if request.form['options'] == '0':
+            flag_date = True
+        else:
+            flag_date = False
+        print(region)
     db_sess = db_session.create_session()
     list_problems = []
     for i in db_sess.query(Complaint).all():
@@ -97,22 +127,35 @@ def co():
             flag = True
         else:
             flag = False
+        if f'{i.id}.jpg' not in os.listdir('static/img/img_problems'):
+            write_to_file(i.photo, f'static/img/img_problems/{i.id}.jpg')
         diction = {}
         diction['id'] = i.id
         diction['name'] = i.name
         diction['text'] = i.description
         diction['lat'] = i.coordinates.split(',')[0]
         diction['lon'] = i.coordinates.split(',')[1]
-        diction['date'] = i.modifed_date
+        diction['datetime'] = i.modifed_date
+        diction['date'] = transformation_date(str(i.modifed_date))
         diction['category'] = i.category
+        diction['n_ver'] = i.n_confirmation
         diction['ver'] = flag
         diction['color'] = DICT_COLORS_PROBLEMS[i.category]
         diction['label'] = DICT_COLORS_LABELS[i.category]
-        list_problems.append(diction)
-    print(request.remote_addr)
-    return render_template('problems.html', list_problems=list_problems)
+        print(geocode(f'{diction["lon"]},{diction["lat"]}')['metaDataProperty']['GeocoderMetaData']['text'])
+        if region != 'все' and region in geocode(f'{diction["lon"]},{diction["lat"]}')['metaDataProperty']['GeocoderMetaData']['text']:
+            list_problems.append(diction)
+        elif region == 'все':
+            list_problems.append(diction)
+    if flag_date:
+        list_problems.sort(key=operator.itemgetter('datetime'), reverse=True)
+    else:
+        list_problems.sort(key=operator.itemgetter('n_ver'), reverse=True)
+    with open('static/txt/regions.txt', 'r', encoding='utf-8') as file:
+        lst = file.readlines()
+    return render_template('problems.html', list_problems=list_problems, title='Проблемы', lst_regions=lst)
 
 
 if __name__ == '__main__':
-    db_session.global_init("db/users_my_site.db")
+    db_session.global_init("db/site_db.db")
     app.run('localhost', 8000)

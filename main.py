@@ -3,7 +3,7 @@ from data.complaints import Complaint
 from data.thanks import Thank
 from data.sentenses import Sentense
 import os
-import geocoder
+import requests
 import math
 
 
@@ -43,19 +43,19 @@ def write_to_file(data, filename):
 
 
 def add_complaint(**kwards):
-    db_session.global_init("db/users_my_site.db")
+    print(kwards['category'])
+    db_session.global_init("db/site_db.db")
     db_sess = db_session.create_session()
     for i in ['name', 'description', 'coordinates', 'photo', 'date']:
         if i not in list(kwards.keys()):
             return
-    print(6)
-    for i in db_sess.query(Complaint).all():
-        if lonlat_distance((float(kwards['coordinates'].split(',')[0]), float(kwards['coordinates'].split(',')[1])),
-                           (float(i.coordinates.split(',')[0]), float(i.coordinates.split(',')[1]))) <= 20:
-            i.n_confirmation += 1
-            db_sess.commit()
-            return
-    print(7)
+    #for i in db_sess.query(Complaint).all():
+    #    if lonlat_distance((float(kwards['coordinates'].split(',')[0]), float(kwards['coordinates'].split(',')[1])),
+    #                       (float(i.coordinates.split(',')[0]), float(i.coordinates.split(',')[1]))) <= 20:
+    #        i.n_confirmation += 1
+    #        db_sess.commit()
+    #        return
+    write_to_file(kwards['photo'], f'static/img/img_problems/{list(db_sess.query(Complaint).all())[-1].id + 1}.jpg')
     if 'category' not in list(kwards.keys()):
         complaint = Complaint(
             name=kwards['name'],
@@ -70,7 +70,7 @@ def add_complaint(**kwards):
             description=kwards['description'],
             coordinates=kwards['coordinates'],
             photo=kwards['photo'],
-            category=kwards['category']
+            category=kwards['category'].split()[0]
         )
     db_sess.add(complaint)
     db_sess.commit()
@@ -84,11 +84,12 @@ def add_thanks(**kwards):
             return
     for i in db_sess.query(Thank).all():
         if kwards['coordinates'] == i.coordinates:
-            thanks = db_sess.query(Complaint).filter(Thank.coordinates == kwards['coordinates']).first()
+            thanks = db_sess.query(Thank).filter(Thank.coordinates == kwards['coordinates']).first()
             thanks.n_accession += 1
             db_sess.commit()
             return
-    thanks = Complaint(
+    write_to_file(kwards['photo'], f'static/img/thanks/{len(list(db_sess.query(Thank).all())) + 1}.jpg')
+    thanks = Thank(
         name=kwards['name'],
         description=kwards['description'],
         coordinates=kwards['coordinates'],
@@ -120,3 +121,29 @@ def add_sentense(**kwards):
 # add_complaint(name='Прорвало трубы', description='В подъезде вода...',
 #              photo=convert_to_binary_data('static/img/broken_road.jpg'),
 #              coordinates='54.9792438711978,60.36213526917058', category='ЖКХ')
+
+API_KEY = '40d1649f-0493-4b70-98ba-98533de7710b'
+
+
+def geocode(address):
+    # Собираем запрос для геокодера.
+    geocoder_request = f"http://geocode-maps.yandex.ru/1.x/?apikey={API_KEY}" \
+                       f"&geocode={address}&format=json"
+
+    # Выполняем запрос.
+    response = requests.get(geocoder_request)
+
+    if response:
+        # Преобразуем ответ в json-объект
+        json_response = response.json()
+    else:
+        raise RuntimeError(
+            """Ошибка выполнения запроса:
+            {request}
+            Http статус: {status} ({reason})""".format(
+                request=geocoder_request, status=response.status_code, reason=response.reason))
+
+    # Получаем первый топоним из ответа геокодера.
+    # Согласно описанию ответа он находится по следующему пути:
+    features = json_response["response"]["GeoObjectCollection"]["featureMember"]
+    return features[0]["GeoObject"] if features else None

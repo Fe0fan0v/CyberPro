@@ -1,13 +1,10 @@
 from telebot import types
-from exif import Image
-import numpy as np
 import datetime
 import tempfile
 import logging
 import telebot
 import time
 from main import add_complaint, add_thanks, add_sentense
-import os
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 complain_level = 0
@@ -107,13 +104,13 @@ def create_output_data():
             return
         if before_output_data[0] == "Complain":
             # if ["Bite-photo", "Description", "Location", "Name"] == list(output_data.keys()).sort():
-            add_complaint(coordinates=f'{output_data["Location"][0]},{output_data["Location"][1]}',
+            add_complaint(coordinates=f'{output_data["Location"][1]},{output_data["Location"][0]}',
                           name=output_data["Name"], description=output_data["Description"],
-                          photo=output_data["Bite-photo"], date=output_data["Date"])
+                          photo=output_data["Bite-photo"], date=output_data["Date"], category=output_data["Type"])
             output_data = {}
         elif before_output_data[0] == "Gratitude":
             if ["Bite-photo", "Description", "Name"] == list(output_data.keys()).sort():
-                add_thanks(coordinates=f'{output_data["Location"][0]},{output_data["Location"][1]}',
+                add_thanks(coordinates=f'{output_data["Location"][1]},{output_data["Location"][0]}',
                            name=output_data["Name"], description=output_data["Description"],
                            photo=output_data["Bite-photo"])
                 output_data = {}

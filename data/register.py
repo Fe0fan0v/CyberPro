@@ -10,4 +10,5 @@ class RegisterForm(FlaskForm):
     password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
     name = StringField('Имя', validators=[DataRequired()])
     surname = StringField('Фамилия', validators=[DataRequired()])
+    id_tele = StringField('ID вашего телеграмма', validators=[DataRequired()])
     submit = SubmitField('Зарегистрировать')
