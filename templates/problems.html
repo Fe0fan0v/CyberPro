@@ -5,12 +5,8 @@
     <div style="position: absolute; top: 6%; left:25%; width: 50%; color: white;
     border: 4px solid black; padding: 10px; background-color: rgb(28, 28, 28); font-size: large; height: 400%">
         <form method="post"><div>
-            <input type="radio" class="btn-check" name="options" id="option1" value="0" checked autocomplete="off">
-            <label class="btn btn-secondary" for="option1">По новизне</label>
-
-            <input type="radio" class="btn-check" name="options" id="option2" value="1" autocomplete="off">
-            <label class="btn btn-secondary" for="option2">По актуальности</label>
-
+            <button type="submit" class="btn btn{{ backlight[0] }}-secondary" name="options" value="0">По новизне</button>
+            <button type="submit" class="btn btn{{ backlight[1] }}-secondary" name="options" value="1">По актуальности</button>
             <select class="form-select" aria-label="Default select example" name="region">
                 <option selected value="все">Все регионы</option>
                 {% for i in lst_regions %}
@@ -46,8 +42,11 @@
                     </div>
                     {% endif %}
                     <form method="post">
-                    <input type="checkbox" class="btn-check" name="problem" id="btn-check-outlined{{ i['id'] }}" value="{{ i['id'] }}" autocomplete="off" style="opacity: 0;">
-                    <label class="btn btn-outline-primary" for="btn-check-outlined{{ i['id'] }}" >Подтвердить</label></form>
+                        {% for j in lst_confir %}
+                            {% if j[0] == i['id'] %}
+                        <button class="btn btn{{ j[1] }}-primary"  type="submit" name="{{ i['id'] }}" value="{{ i['id'] }}">Подтвердить</button></form>
+                    {% endif %}
+                    {% endfor %}
 
                 </div>
             </article>

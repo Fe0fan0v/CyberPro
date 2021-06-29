@@ -49,12 +49,13 @@ def add_complaint(**kwards):
     for i in ['name', 'description', 'coordinates', 'photo', 'date']:
         if i not in list(kwards.keys()):
             return
-    #for i in db_sess.query(Complaint).all():
-    #    if lonlat_distance((float(kwards['coordinates'].split(',')[0]), float(kwards['coordinates'].split(',')[1])),
-    #                       (float(i.coordinates.split(',')[0]), float(i.coordinates.split(',')[1]))) <= 20:
-    #        i.n_confirmation += 1
-    #        db_sess.commit()
-    #        return
+    for i in db_sess.query(Complaint).all():
+        if lonlat_distance((float(kwards['coordinates'].split(',')[0]), float(kwards['coordinates'].split(',')[1])),
+                           (float(i.coordinates.split(',')[0]), float(i.coordinates.split(',')[1]))) <= 20 and \
+                kwards['category'] == i.category:
+            i.n_confirmation += 1
+            db_sess.commit()
+            return
     write_to_file(kwards['photo'], f'static/img/img_problems/{list(db_sess.query(Complaint).all())[-1].id + 1}.jpg')
     if 'category' not in list(kwards.keys()):
         complaint = Complaint(
@@ -117,6 +118,8 @@ def add_sentense(**kwards):
     db_sess.add(sentense)
     db_sess.commit()
     return
+
+
 # db_session.global_init("db/users_my_site.db")
 # add_complaint(name='Прорвало трубы', description='В подъезде вода...',
 #              photo=convert_to_binary_data('static/img/broken_road.jpg'),
