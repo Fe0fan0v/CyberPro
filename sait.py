@@ -15,6 +15,11 @@ app.config['SECRET_KEY'] = 'ryasov_secret_key'
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+db_session.global_init("db/site_db.db")
+db_sess = db_session.create_session()
+lst_confir = []
+for i in db_sess.query(Complaint).all():
+    lst_confir.append([i.id, '-outline'])
 
 
 @login_manager.user_loader
@@ -72,10 +77,10 @@ def logout():
 def index():
     db_session.global_init("db/site_db.db")
     user_answer = '4'
+    lst_backlight = ['-outline', '-outline', '-outline', '-outline', '-outline']
     if request.method == 'POST':
-        if 'submit_button' in request.form:
-            user_answer = request.form['category']
-            print(user_answer)
+        user_answer = request.form['category']
+    lst_backlight[int(user_answer)] = ''
     db_sess = db_session.create_session()
     list_problems = []
     for i in db_sess.query(Complaint).all():
@@ -106,21 +111,34 @@ def index():
         else:
             continue
         list_problems.append(diction)
-    return render_template('geolocation.html', title='Главная', list_problems=list_problems)
+    return render_template('geolocation.html', title='Главная', list_problems=list_problems, backlight=lst_backlight)
 
 
 @app.route('/c', methods=["GET", 'POST'])
 def co():
-    flag_date = True
-    region = 'все'
-    if request.method == "POST" and 'submit_button' in request.form:
-        region = request.form['region']
-        if request.form['options'] == '0':
-            flag_date = True
-        else:
-            flag_date = False
-        print(region)
+    global lst_confir
     db_sess = db_session.create_session()
+    flag_date = 0
+    lst_backlight = ['-outline', '-outline']
+    region = 'все'
+
+    if request.method == "POST":
+        if 'submit_button' in request.form:
+            region = request.form['region'].strip()
+            # print([region])
+        if 'options' in request.form:
+            if request.form['options'] == '0':
+                flag_date = 0
+            else:
+                flag_date = 1
+        for j in lst_confir:
+            if str(j[0]) in request.form:
+                print(lst_confir)
+                if j[1] == '':
+                    lst_confir[lst_confir.index(j)][1] = '-outline'
+                else:
+                    lst_confir[lst_confir.index(j)][1] = ''
+    lst_backlight[flag_date] = ''
     list_problems = []
     for i in db_sess.query(Complaint).all():
         if i.n_confirmation >= 5:
@@ -142,18 +160,21 @@ def co():
         diction['ver'] = flag
         diction['color'] = DICT_COLORS_PROBLEMS[i.category]
         diction['label'] = DICT_COLORS_LABELS[i.category]
-        print(geocode(f'{diction["lon"]},{diction["lat"]}')['metaDataProperty']['GeocoderMetaData']['text'])
-        if region != 'все' and region in geocode(f'{diction["lon"]},{diction["lat"]}')['metaDataProperty']['GeocoderMetaData']['text']:
+        # print(geocode(f'{diction["lon"]},{diction["lat"]}')['metaDataProperty']['GeocoderMetaData']['text'])
+        if region != 'все' and region in \
+                geocode(f'{diction["lon"]},{diction["lat"]}')['metaDataProperty']['GeocoderMetaData']['text']:
             list_problems.append(diction)
         elif region == 'все':
             list_problems.append(diction)
-    if flag_date:
+    if flag_date == 0:
         list_problems.sort(key=operator.itemgetter('datetime'), reverse=True)
     else:
         list_problems.sort(key=operator.itemgetter('n_ver'), reverse=True)
     with open('static/txt/regions.txt', 'r', encoding='utf-8') as file:
         lst = file.readlines()
-    return render_template('problems.html', list_problems=list_problems, title='Проблемы', lst_regions=lst)
+    return render_template(
+        'problems.html', list_problems=list_problems, title='Проблемы', lst_regions=lst, backlight=lst_backlight,
+        lst_confir=lst_confir)
 
 
 if __name__ == '__main__':

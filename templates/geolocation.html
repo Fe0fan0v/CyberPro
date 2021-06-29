@@ -4,18 +4,12 @@
 <!-- <div style="hight: 100%; width: 100%; align: center;"> -->
 <h1 style="position: absolute; top: 12%; left: 43%; font-weight: bold;">Карта проблем</h1>
 <div id="map" style="width: 100%; height: 900px; padding: 20%;"></div>
-<form style="position: absolute; left: 32%; top: 20%;" method="post">
-            <input type="radio" class="btn-check" name="category" id="option1" value="0" autocomplete="off" checked>
-    <label class="btn btn-outline-danger" for="option1">Дорожная</label>
-<input type="radio" class="btn-check" name="category" id="option2" value="1" autocomplete="off" checked>
-    <label class="btn btn-outline-danger" for="option2">Экологическая</label>
-<input type="radio" class="btn-check" name="category" id="option3" value="2" autocomplete="off" checked>
-    <label class="btn btn-outline-danger" for="option3">ЖКХ</label>
-<input type="radio" class="btn-check" name="category" id="option4" value="3" autocomplete="off" checked>
-    <label class="btn btn-outline-danger" for="option4">Другое</label>
-    <input type="radio" class="btn-check" name="category" id="option5" value="4" autocomplete="off" checked>
-    <label class="btn btn-outline-danger" for="option5">Все</label>
-    <input class="btn btn-primary" type="submit" value="Перестроить" name="submit_button">
+<form style="position: absolute; left: 34%; top: 20%;" method="post">
+    <button class="btn btn{{ backlight[0] }}-danger" type="submit" name="category" value="0" style="margin: 15px;">Дорожная</button>
+    <button class="btn btn{{ backlight[1] }}-danger" type="submit" name="category" value="1" style="margin: 15px;">Экологическая</button>
+    <button class="btn btn{{ backlight[2] }}-danger" type="submit" name="category" value="2" style="margin: 15px;">ЖКХ</button>
+    <button class="btn btn{{ backlight[3] }}-danger" type="submit" name="category" value="3" style="margin: 15px;">Другая</button>
+    <button class="btn btn{{ backlight[4] }}-danger" type="submit" name="category" value="4" style="margin: 15px;">Все</button>
           </form>
 <script src="http://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
 <script type="text/javascript">
@@ -28,7 +22,7 @@ function init () {
         // Масштаб, тут все просто
         zoom: 9,
         // Отключаем все элементы управления
-        controls: ['zoomControl']
+        controls: ['zoomControl', 'fullscreenControl']
     });
 
     var myGeoObjects = [];
