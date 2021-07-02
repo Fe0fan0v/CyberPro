@@ -4,8 +4,11 @@ import tempfile
 import logging
 import telebot
 import time
+import traceback
 from main import add_complaint, add_thanks, add_sentense
 
+# -------------------------------------------------------------------------------------------------------------------------------------
+DEBUG_VERSION = True
 # -------------------------------------------------------------------------------------------------------------------------------------
 complain_level = 0
 # -------------------------------------------------------------------------------------------------------------------------------------
@@ -29,10 +32,13 @@ def write_message(message, text):
     try:
         bot.send_message(message.chat.id, text)
     except Exception as error_message:
-        logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
-        log = open("log.txt", "a", encoding="UTF-8")
-        log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
-        log.close()
+        if not DEBUG_VERSION:
+            logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
+            log = open("log.txt", "a", encoding="UTF-8")
+            log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
+            log.close()
+        else:
+            print("\033[33m {}".format(traceback.format_exc()))
 
 
 def photo_download(message, get_type):
@@ -56,10 +62,13 @@ def photo_download(message, get_type):
         elif get_type == 2:
             create_output_data()
     except Exception as error_message:
-        logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
-        log = open("log.txt", "a", encoding="UTF-8")
-        log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
-        log.close()
+        if not DEBUG_VERSION:
+            logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
+            log = open("log.txt", "a", encoding="UTF-8")
+            log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
+            log.close()
+        else:
+            print("\033[33m {}".format(traceback.format_exc()))
 
 
 def asc_location(message):
@@ -70,10 +79,13 @@ def asc_location(message):
         bot.send_message(message.chat.id, "Отправьте геоданные для обнаружения проблемы на карте 🗺"
                                           "(для этого надо включить геоданные).", reply_markup=keyboard)
     except Exception as error_message:
-        logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
-        log = open("log.txt", "a", encoding="UTF-8")
-        log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
-        log.close()
+        if not DEBUG_VERSION:
+            logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
+            log = open("log.txt", "a", encoding="UTF-8")
+            log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
+            log.close()
+        else:
+            print("\033[33m {}".format(traceback.format_exc()))
 
 
 def create_output_data():
@@ -119,10 +131,13 @@ def create_output_data():
                          file=output_data["Files"])
             output_data = {}
     except Exception as error_message:
-        logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
-        log = open("log.txt", "a", encoding="UTF-8")
-        log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
-        log.close()
+        if not DEBUG_VERSION:
+            logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
+            log = open("log.txt", "a", encoding="UTF-8")
+            log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
+            log.close()
+        else:
+            print("\033[33m {}".format(traceback.format_exc()))
 
 
 # -------------------------------------------------------------------------------------------------------------------------------------
@@ -142,10 +157,13 @@ def location(message):
                 keyboard.add(i)
             bot.send_message(message.chat.id, "В заключение выберите тип проблемы:", reply_markup=keyboard)
         except Exception as error_message:
-            logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
-            log = open("log.txt", "a", encoding="UTF-8")
-            log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
-            log.close()
+            if not DEBUG_VERSION:
+                logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
+                log = open("log.txt", "a", encoding="UTF-8")
+                log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
+                log.close()
+            else:
+                print("\033[33m {}".format(traceback.format_exc()))
     else:
         write_message(message, "Проблемы с обнаружением. Попробуйте ещё раз")
 
@@ -161,10 +179,13 @@ def welcome(message):
         bot.send_message(message.chat.id, f'Здравствуйте, {message.from_user.first_name}! Выбирите действие:',
                          reply_markup=keyboard)
     except Exception as error_message:
-        logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
-        log = open("log.txt", "a", encoding="UTF-8")
-        log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
-        log.close()
+        if not DEBUG_VERSION:
+            logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
+            log = open("log.txt", "a", encoding="UTF-8")
+            log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
+            log.close()
+        else:
+            print("\033[33m {}".format(traceback.format_exc()))
 
 
 @bot.message_handler(commands=['help'])
@@ -178,10 +199,13 @@ def welcome(message):
         keyboard.add(button_appeal, button_proposal, button_gratitude)
         bot.send_message(message.chat.id, 'Выбирите действие:', reply_markup=keyboard)
     except Exception as error_message:
-        logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
-        log = open("log.txt", "a", encoding="UTF-8")
-        log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
-        log.close()
+        if not DEBUG_VERSION:
+            logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
+            log = open("log.txt", "a", encoding="UTF-8")
+            log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
+            log.close()
+        else:
+            print("\033[33m {}".format(traceback.format_exc()))
 
 
 @bot.message_handler(content_types=['text', 'photo'])
@@ -282,17 +306,14 @@ def start(message):
             write_message(message, "Извините, не понял вашего ответа.")
 
     except Exception as error_message:
-        logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
-        log = open("log.txt", "a", encoding="UTF-8")
-        log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
-        log.close()
+        if not DEBUG_VERSION:
+            logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
+            log = open("log.txt", "a", encoding="UTF-8")
+            log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
+            log.close()
+        else:
+            print("\033[33m {}".format(traceback.format_exc()))
 
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 bot.polling(none_stop=True, interval=0)
-
-"""
-1) Вставить это в описание бота:
-    Здравствуйте! Этот бот создан для отправки жалоб, предложений и благодарностей.\n 
-    Если вы хотите узнать форму отправки для каждого вида сообщения, напишите /help
-"""
