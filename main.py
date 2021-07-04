@@ -1,5 +1,6 @@
 from data import db_session
 from data.complaints import Complaint
+from data.users import User
 from data.thanks import Thank
 from data.sentenses import Sentense
 import os
@@ -43,7 +44,6 @@ def write_to_file(data, filename):
 
 
 def add_complaint(**kwards):
-    print(kwards['category'])
     db_session.global_init("db/site_db.db")
     db_sess = db_session.create_session()
     for i in ['name', 'description', 'coordinates', 'photo', 'date']:
@@ -56,7 +56,8 @@ def add_complaint(**kwards):
             i.n_confirmation += 1
             db_sess.commit()
             return
-    write_to_file(kwards['photo'], f'static/img/img_problems/{list(db_sess.query(Complaint).all())[-1].id + 1}.jpg')
+    # write_to_file(kwards['photo'], f'static/img/img_problems/{list(db_sess.query(Complaint).all())[-1].id + 1}.jpg')
+
     if 'category' not in list(kwards.keys()):
         complaint = Complaint(
             name=kwards['name'],
@@ -74,6 +75,12 @@ def add_complaint(**kwards):
             category=kwards['category'].split()[0]
         )
     db_sess.add(complaint)
+
+    user = db_sess.query(User).filter(User.id_tele == kwards['id_tele']).first()
+    if user.my_problems:
+        user.my_problems += f'{db_sess.query(Complaint).filter(Complaint.coordinates == kwards["coordinates"]).first().id},'
+    else:
+        user.my_problems = f'{db_sess.query(Complaint).filter(Complaint.coordinates == kwards["coordinates"]).first().id},'
     db_sess.commit()
     return
 
