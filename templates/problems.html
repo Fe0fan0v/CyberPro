@@ -4,16 +4,52 @@
     <meta charset="UTF-8">
     <div style="position: absolute; top: 6%; left:25%; width: 50%; color: white;
     border: 4px solid black; padding: 10px; background-color: rgb(28, 28, 28); font-size: large; height: 400%">
-        <form method="post"><div>
+        <div><form method="post">
             <button type="submit" class="btn btn{{ backlight[0] }}-secondary" name="options" value="0">По новизне</button>
-            <button type="submit" class="btn btn{{ backlight[1] }}-secondary" name="options" value="1">По актуальности</button>
-            <select class="form-select" aria-label="Default select example" name="region">
+            <button type="submit" class="btn btn{{ backlight[1] }}-secondary" name="options" value="1">По актуальности</button></form></div>
+            <form action="">
+                <select class="form-select" aria-label="Default select example" style="position: absolute; left: 40%; top: 0.5%;" name="lst">
                 <option selected value="все">Все регионы</option>
                 {% for i in lst_regions %}
                 <option value="{{ i }}">{{ i }}</option>
                 {% endfor %}
-            </select><input class="btn btn-primary" type="submit" value="Перестроить" name="submit_button">
-        </div></form>
+                    </select>
+                </form>
+            <script>
+                const formSelect = document.querySelector('.form-select')
+                const form = document.querySelector('form')
+                // если форм несколько, то лучше добавить поиск элемента так: document.querySelector('.класс')
+                // или document.querySelector('#id')
+
+                formSelect.addEventListener('input', function(evt){
+                    evt.preventDefault();
+
+                    submitOption()
+                })
+                const onLoadSuccess = (data) => {
+                    console.log('load', data);
+                }
+                const onLoadError = (data) => {
+                    console.log('err', data);
+                }
+                // выводы в консоль можно будет удалить
+
+                const loadData = function(data, onSuccess, onError){
+                fetch('http://localhost:8008/c', {
+                    // Выше, где https:// нужно написать адрес, куда отправляются данные
+                method: 'POST',
+                body: data,
+                 }).then(onSuccess).catch(onError)};
+
+                const submitOption = function(){
+                    const dataForm =  new FormData(form);
+                    loadData(dataForm, onLoadSuccess, onLoadError);
+
+                }
+
+            </script>
+            <!-- <input class="btn btn-primary" type="submit" value="Перестроить" name="submit_button"> -->
+
         {% for i in list_problems %}
         <section>
             <article class="cell">
@@ -41,12 +77,14 @@
                         <img src="../static/img/verified.png" style="text-align: center;" height="50%" width="50%">
                     </div>
                     {% endif %}
+                    {% if current_user.is_authenticated %}
                     <form method="post">
                         {% for j in lst_confir %}
                             {% if j[0] == i['id'] %}
                         <button class="btn btn{{ j[1] }}-primary"  type="submit" name="{{ i['id'] }}" value="{{ i['id'] }}">Подтвердить</button></form>
                     {% endif %}
                     {% endfor %}
+                    {% endif %}
 
                 </div>
             </article>

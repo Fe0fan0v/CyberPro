@@ -8,7 +8,10 @@ import traceback
 from main import add_complaint, add_thanks, add_sentense
 
 # -------------------------------------------------------------------------------------------------------------------------------------
+
+=======
 DEBUG_VERSION = True
+
 # -------------------------------------------------------------------------------------------------------------------------------------
 complain_level = 0
 # -------------------------------------------------------------------------------------------------------------------------------------
@@ -41,6 +44,7 @@ def write_message(message, text):
             print("\033[33m {}".format(traceback.format_exc()))
 
 
+
 def photo_download(message, get_type):
     global before_output_data
     try:
@@ -60,7 +64,7 @@ def photo_download(message, get_type):
             before_output_data.append(datetime.datetime.now().strftime("%d.%m.%y %H:%M"))
             asc_location(message)
         elif get_type == 2:
-            create_output_data()
+            create_output_data(message.from_user.id)
     except Exception as error_message:
         if not DEBUG_VERSION:
             logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
@@ -69,6 +73,7 @@ def photo_download(message, get_type):
             log.close()
         else:
             print("\033[33m {}".format(traceback.format_exc()))
+
 
 
 def asc_location(message):
@@ -88,7 +93,8 @@ def asc_location(message):
             print("\033[33m {}".format(traceback.format_exc()))
 
 
-def create_output_data():
+
+def create_output_data(user_id):
     global output_data, before_output_data
     try:
         if before_output_data[0] == "Complain":
@@ -100,24 +106,27 @@ def create_output_data():
             locate = (locate[0].strip(), locate[1].strip())
             output_data["Location"] = locate
             output_data["Type"] = before_output_data[6]
+            output_data["user_id"] = user_id
         elif before_output_data[0] == "Gratitude":
             output_data["Name"] = before_output_data[1]
             output_data["Description"] = before_output_data[2]
             output_data["Bite-photo"] = before_output_data[3]
             output_data["Date"] = before_output_data[4]
+            output_data["user_id"] = user_id
         elif before_output_data[0] == "Offer":
             output_data["Name"] = before_output_data[1]
             output_data["Description"] = before_output_data[2]
             output_data["Files"] = before_output_data[3]
             output_data["Date"] = before_output_data[4]
+            output_data["user_id"] = user_id
         if output_data:
             pass
         else:
             return
         if before_output_data[0] == "Complain":
-            # if ["Bite-photo", "Description", "Location", "Name"] == list(output_data.keys()).sort():
             add_complaint(coordinates=f'{output_data["Location"][1]},{output_data["Location"][0]}',
                           name=output_data["Name"], description=output_data["Description"],
+                          id_tele=output_data["user_id"],
                           photo=output_data["Bite-photo"], date=output_data["Date"], category=output_data["Type"])
             output_data = {}
         elif before_output_data[0] == "Gratitude":
@@ -208,6 +217,7 @@ def welcome(message):
             print("\033[33m {}".format(traceback.format_exc()))
 
 
+
 @bot.message_handler(content_types=['text', 'photo'])
 def start(message):
     global complain_level, before_output_data, offer_level, gratitude_level
@@ -246,7 +256,7 @@ def start(message):
                 photo_download(message, 1)
             elif complain_level == 4:
                 before_output_data.append(message.text)
-                create_output_data()
+                create_output_data(message.from_user.id)
                 complain_level = 0
                 before_output_data = []
                 keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
