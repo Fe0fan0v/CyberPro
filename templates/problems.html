@@ -79,11 +79,13 @@
                     {% endif %}
                     {% if current_user.is_authenticated %}
                     <form method="post">
-                        {% for j in lst_confir %}
-                            {% if j[0] == i['id'] %}
-                        <button class="btn btn{{ j[1] }}-primary"  type="submit" name="{{ i['id'] }}" value="{{ i['id'] }}">Подтвердить</button></form>
-                    {% endif %}
-                    {% endfor %}
+                       {% if i['pub'] == 0 %}
+                        <button class="btn btn-outline-primary"  type="submit" name="prob_0" value="{{ i['id'] }}">Подтвердить</button></form>
+                        {% elif i['pub'] == -1 %}
+                        <button class="btn btn-primary"  type="submit" name="prob_1" value="{{ i['id'] }}">Подтвердить</button></form>
+                        {% else %}
+                        <button class="btn btn-danger"  type="submit" disabled>Опубликована</button></form>
+                        {% endif %}
                     {% endif %}
 
                 </div>
