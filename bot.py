@@ -8,7 +8,10 @@ import traceback
 from main import add_complaint, add_thanks, add_sentense
 
 # -------------------------------------------------------------------------------------------------------------------------------------
-DEBUG_VERSION = False
+
+=======
+DEBUG_VERSION = True
+
 # -------------------------------------------------------------------------------------------------------------------------------------
 complain_level = 0
 # -------------------------------------------------------------------------------------------------------------------------------------
@@ -38,7 +41,8 @@ def write_message(message, text):
             log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
             log.close()
         else:
-            print(traceback.format_exc())
+            print("\033[33m {}".format(traceback.format_exc()))
+
 
 
 def photo_download(message, get_type):
@@ -68,7 +72,8 @@ def photo_download(message, get_type):
             log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
             log.close()
         else:
-            print(traceback.format_exc())
+            print("\033[33m {}".format(traceback.format_exc()))
+
 
 
 def asc_location(message):
@@ -85,7 +90,8 @@ def asc_location(message):
             log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
             log.close()
         else:
-            print(traceback.format_exc())
+            print("\033[33m {}".format(traceback.format_exc()))
+
 
 
 def create_output_data(user_id):
@@ -140,7 +146,7 @@ def create_output_data(user_id):
             log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
             log.close()
         else:
-            print(traceback.format_exc())
+            print("\033[33m {}".format(traceback.format_exc()))
 
 
 # -------------------------------------------------------------------------------------------------------------------------------------
@@ -166,7 +172,7 @@ def location(message):
                 log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
                 log.close()
             else:
-                print(traceback.format_exc())
+                print("\033[33m {}".format(traceback.format_exc()))
     else:
         write_message(message, "Проблемы с обнаружением. Попробуйте ещё раз")
 
@@ -188,7 +194,7 @@ def welcome(message):
             log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
             log.close()
         else:
-            print(traceback.format_exc())
+            print("\033[33m {}".format(traceback.format_exc()))
 
 
 @bot.message_handler(commands=['help'])
@@ -208,7 +214,8 @@ def welcome(message):
             log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
             log.close()
         else:
-            print(traceback.format_exc())
+            print("\033[33m {}".format(traceback.format_exc()))
+
 
 
 @bot.message_handler(content_types=['text', 'photo'])
@@ -315,7 +322,7 @@ def start(message):
             log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
             log.close()
         else:
-            print(traceback.format_exc())
+            print("\033[33m {}".format(traceback.format_exc()))
 
 
 # -------------------------------------------------------------------------------------------------------------------------------------
