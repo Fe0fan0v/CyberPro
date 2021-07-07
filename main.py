@@ -56,11 +56,8 @@ def add_complaint(**kwards):
             i.n_confirmation += 1
             db_sess.commit()
             return
-    try:
-        name_photo = f'static/img/img_problems/{list(db_sess.query(Complaint).all())[-1].id + 1}.jpg'
-    except IndexError:
-        name_photo = f'static/img/img_problems/1.jpg'
-    # write_to_file(kwards['photo'], name_photo)
+    # write_to_file(kwards['photo'], f'static/img/img_problems/{list(db_sess.query(Complaint).all())[-1].id + 1}.jpg')
+
     if 'category' not in list(kwards.keys()):
         complaint = Complaint(
             name=kwards['name'],

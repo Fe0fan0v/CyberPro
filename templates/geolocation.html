@@ -35,11 +35,10 @@ function init () {
                         {% if i['ver'] == True %}
                         balloonContentBody: '<img src="static/img/img_problems/{{ i['id'] }}.jpg" height="135" width="180"> <br/> ' +
                         '<img src="static/img/verified.png" height="32" width="150"> <br/> ',
-                        balloonContentFooter: 'Проблема обнародована:<br/> {{ i['date'] }}',}
                         {% else %}
                         balloonContentBody: '<img src="static/img/img_problems/{{ i['id'] }}.jpg" height="135" width="180"> <br/> ',
-                        balloonContentFooter: 'Проблема обнародована:<br/> {{ i['date'] }}',}
                         {% endif %}
+                        balloonContentFooter: 'Проблема обнародована:<br/> {{ i['date'] }}<br/><a href = "http://localhost:{{ url }}/problem/{{ i['id'] }}">Узнать поподробнее</a>',}
                         ,{
                         iconLayout: 'default#image',
                         // Путь до нашей картинки
