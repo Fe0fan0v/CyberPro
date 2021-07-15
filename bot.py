@@ -5,13 +5,10 @@ import logging
 import telebot
 import time
 import traceback
-from main import add_complaint, add_thanks, add_sentense
+from db_work import add_complaint, add_thanks, add_sentense
 
 # -------------------------------------------------------------------------------------------------------------------------------------
-
-=======
-DEBUG_VERSION = True
-
+DEBUG_VERSION = False
 # -------------------------------------------------------------------------------------------------------------------------------------
 complain_level = 0
 # -------------------------------------------------------------------------------------------------------------------------------------
@@ -41,8 +38,7 @@ def write_message(message, text):
             log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
             log.close()
         else:
-            print("\033[33m {}".format(traceback.format_exc()))
-
+            print(traceback.format_exc())
 
 
 def photo_download(message, get_type):
@@ -72,8 +68,7 @@ def photo_download(message, get_type):
             log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
             log.close()
         else:
-            print("\033[33m {}".format(traceback.format_exc()))
-
+            print(traceback.format_exc())
 
 
 def asc_location(message):
@@ -90,8 +85,7 @@ def asc_location(message):
             log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
             log.close()
         else:
-            print("\033[33m {}".format(traceback.format_exc()))
-
+            print(traceback.format_exc())
 
 
 def create_output_data(user_id):
@@ -111,8 +105,7 @@ def create_output_data(user_id):
             output_data["Name"] = before_output_data[1]
             output_data["Description"] = before_output_data[2]
             output_data["Bite-photo"] = before_output_data[3]
-            output_data["Date"] = before_output_data[4]
-            output_data["user_id"] = user_id
+            #output_data["Date"] = before_output_data[4]
         elif before_output_data[0] == "Offer":
             output_data["Name"] = before_output_data[1]
             output_data["Description"] = before_output_data[2]
@@ -130,11 +123,9 @@ def create_output_data(user_id):
                           photo=output_data["Bite-photo"], date=output_data["Date"], category=output_data["Type"])
             output_data = {}
         elif before_output_data[0] == "Gratitude":
-            if ["Bite-photo", "Description", "Name"] == list(output_data.keys()).sort():
-                add_thanks(coordinates=f'{output_data["Location"][1]},{output_data["Location"][0]}',
-                           name=output_data["Name"], description=output_data["Description"],
-                           photo=output_data["Bite-photo"])
-                output_data = {}
+            add_thanks(name=output_data["Name"], description=output_data["Description"],
+                       photo=output_data["Bite-photo"])
+            output_data = {}
         elif before_output_data[0] == "Offer":
             add_sentense(description=output_data["Description"],
                          file=output_data["Files"])
@@ -146,7 +137,7 @@ def create_output_data(user_id):
             log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
             log.close()
         else:
-            print("\033[33m {}".format(traceback.format_exc()))
+            print(traceback.format_exc())
 
 
 # -------------------------------------------------------------------------------------------------------------------------------------
@@ -172,7 +163,7 @@ def location(message):
                 log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
                 log.close()
             else:
-                print("\033[33m {}".format(traceback.format_exc()))
+                print(traceback.format_exc())
     else:
         write_message(message, "Проблемы с обнаружением. Попробуйте ещё раз")
 
@@ -194,7 +185,7 @@ def welcome(message):
             log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
             log.close()
         else:
-            print("\033[33m {}".format(traceback.format_exc()))
+            print(traceback.format_exc())
 
 
 @bot.message_handler(commands=['help'])
@@ -214,8 +205,7 @@ def welcome(message):
             log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
             log.close()
         else:
-            print("\033[33m {}".format(traceback.format_exc()))
-
+            print(traceback.format_exc())
 
 
 @bot.message_handler(content_types=['text', 'photo'])
@@ -322,7 +312,7 @@ def start(message):
             log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
             log.close()
         else:
-            print("\033[33m {}".format(traceback.format_exc()))
+            print(traceback.format_exc())
 
 
 # -------------------------------------------------------------------------------------------------------------------------------------

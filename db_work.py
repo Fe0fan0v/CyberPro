@@ -3,9 +3,9 @@ from data.complaints import Complaint
 from data.users import User
 from data.thanks import Thank
 from data.sentenses import Sentense
-import os
 import requests
 import math
+from constants import write_to_file
 
 
 def lonlat_distance(a, b):
@@ -18,19 +18,6 @@ def lonlat_distance(a, b):
     dy = abs(a_lat - b_lat) * degree_to_meters_factor
     distance = math.sqrt(dx * dx + dy * dy)
     return int(distance)
-
-
-def convert_to_binary_data(filename):
-    # Преобразование данных в двоичный формат
-    with open(filename, 'rb') as file:
-        blob_data = file.read()
-    return blob_data
-
-
-def write_to_file(data, filename):
-    # Преобразование двоичных данных в нужный формат
-    with open(filename, 'wb') as file:
-        file.write(data)
 
 
 # def download_image():
@@ -56,11 +43,8 @@ def add_complaint(**kwards):
             i.n_confirmation += 1
             db_sess.commit()
             return
-    try:
-        name_photo = f'static/img/img_problems/{list(db_sess.query(Complaint).all())[-1].id + 1}.jpg'
-    except IndexError:
-        name_photo = f'static/img/img_problems/1.jpg'
-    # write_to_file(kwards['photo'], name_photo)
+    # write_to_file(kwards['photo'], f'static/img/img_problems/{list(db_sess.query(Complaint).all())[-1].id + 1}.jpg')
+
     if 'category' not in list(kwards.keys()):
         complaint = Complaint(
             name=kwards['name'],
@@ -89,21 +73,24 @@ def add_complaint(**kwards):
 
 
 def add_thanks(**kwards):
+    db_session.global_init("db/site_db.db")
     db_sess = db_session.create_session()
-    for i in ['name', 'description', 'coordinates', 'photo']:
+    for i in ['name', 'description', 'photo']:
         if i not in list(kwards.keys()):
             return
-    for i in db_sess.query(Thank).all():
-        if kwards['coordinates'] == i.coordinates:
-            thanks = db_sess.query(Thank).filter(Thank.coordinates == kwards['coordinates']).first()
-            thanks.n_accession += 1
-            db_sess.commit()
-            return
-    write_to_file(kwards['photo'], f'static/img/thanks/{len(list(db_sess.query(Thank).all())) + 1}.jpg')
+    #for i in db_sess.query(Thank).all():
+    #    if kwards['coordinates'] == i.coordinates:
+    #        thanks = db_sess.query(Thank).filter(Thank.coordinates == kwards['coordinates']).first()
+    #        thanks.n_accession += 1
+    #        db_sess.commit()
+    #        return
+    if db_sess.query(Thank).all():
+        write_to_file(kwards['photo'], f'static/img/thanks/{len(list(db_sess.query(Thank).all())) + 1}.jpg')
+    else:
+        write_to_file(kwards['photo'], f'static/img/thanks/1.jpg')
     thanks = Thank(
         name=kwards['name'],
         description=kwards['description'],
-        coordinates=kwards['coordinates'],
         photo=kwards['photo'],
     )
     db_sess.add(thanks)
