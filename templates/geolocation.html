@@ -33,10 +33,10 @@ function init () {
                         balloonContentHeader: '<a href = "#">{{ i['name'] }}</a><br>' +
                         '<span style="color: {{ i['color'] }};">{{ i['category'] }} проблема</span>',
                         {% if i['ver'] == True %}
-                        balloonContentBody: '<img src="static/img/img_problems/{{ i['id'] }}.jpg" height="135" width="180"> <br/> ' +
+                        balloonContentBody: '<img src="static/img/img_problems/{{ i['id'] }}.jpg" height="{{ i['size'][0] }}" width="{{ i['size'][1] }}"> <br/> ' +
                         '<img src="static/img/verified.png" height="32" width="150"> <br/> ',
                         {% else %}
-                        balloonContentBody: '<img src="static/img/img_problems/{{ i['id'] }}.jpg" height="135" width="180"> <br/> ',
+                        balloonContentBody: '<img src="static/img/img_problems/{{ i['id'] }}.jpg" height="{{ i['size'][0] }}" width="{{ i['size'][1] }}"> <br/> ',
                         {% endif %}
                         balloonContentFooter: 'Проблема обнародована:<br/> {{ i['date'] }}<br/><a href = "http://localhost:{{ url }}/problem/{{ i['id'] }}">Узнать поподробнее</a>',}
                         ,{

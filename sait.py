@@ -6,8 +6,8 @@ from data import db_session
 from data.users import User
 from data.complaints import Complaint
 from constants import *
-from main import write_to_file, geocode
-import os
+from PIL import Image
+from db_work import geocode
 import operator
 
 app = Flask(__name__)
@@ -89,6 +89,7 @@ def index():
             flag = True
         else:
             flag = False
+        recording_img(i.id, i.photo)
         diction = {}
         diction['id'] = i.id
         diction['name'] = i.name
@@ -99,6 +100,13 @@ def index():
         diction['ver'] = flag
         diction['color'] = DICT_COLORS_PROBLEMS[i.category]
         diction['label'] = DICT_COLORS_LABELS[i.category]
+        width, height = Image.open(f"static/img/img_problems/{i.id}.jpg").size
+        if height / width == 0.75:
+            diction['size'] = (135, 180)
+        elif round(height / width, 3) == 0.667:
+            diction['size'] = (120, 180)
+        elif round(height / width, 3) == 1.778:
+            diction['size'] = (267, 150)
         if user_answer == '0' and diction['category'] == 'Дорожная':
             pass
         elif user_answer == '1' and diction['category'] == 'Экологическая':
@@ -113,7 +121,7 @@ def index():
             continue
         list_problems.append(diction)
     return render_template('geolocation.html', title='Главная', list_problems=list_problems, backlight=lst_backlight,
-                            url=URL)
+                           url=URL)
 
 
 @app.route('/all_problems', methods=["GET", 'POST'])
@@ -158,8 +166,7 @@ def all_problems():
             flag = True
         else:
             flag = False
-        if f'{i.id}.jpg' not in os.listdir('static/img/img_problems'):
-            write_to_file(i.photo, f'static/img/img_problems/{i.id}.jpg')
+        recording_img(i.id, i.photo)
         diction = {}
         diction['id'] = i.id
         diction['name'] = i.name
@@ -193,9 +200,10 @@ def all_problems():
         list_problems.sort(key=operator.itemgetter('n_ver'), reverse=True)
     with open('static/txt/regions.txt', 'r', encoding='utf-8') as file:
         lst = file.readlines()
+    len_pr = len(list_problems) * 90
     return render_template(
         'problems.html', list_problems=list_problems, title='Проблемы', lst_regions=lst, backlight=lst_backlight,
-        my_problems=False, url=URL)
+        my_problems=False, url=URL, len_pr=len_pr)
 
 
 @app.route('/my_problems', methods=['GET', 'POST'])
@@ -222,8 +230,7 @@ def my_problems():
             flag = True
         else:
             flag = False
-        if f'{i.id}.jpg' not in os.listdir('static/img/img_problems'):
-            write_to_file(i.photo, f'static/img/img_problems/{i.id}.jpg')
+        recording_img(i.id, i.photo)
         diction = {}
         diction['id'] = i.id
         diction['name'] = i.name
@@ -257,9 +264,10 @@ def my_problems():
         list_problems.sort(key=operator.itemgetter('n_ver'), reverse=True)
     with open('static/txt/regions.txt', 'r', encoding='utf-8') as file:
         lst = file.readlines()
+    len_pr = len(list_problems) * 90
     return render_template(
         'problems.html', list_problems=list_problems, title='Проблемы', lst_regions=lst, backlight=lst_backlight,
-        my_problems=True, url=URL)
+        my_problems=True, url=URL, len_pr=len_pr)
 
 
 @app.route('/problem/<int:id_problem>', methods=['GET', 'POST'])
@@ -287,8 +295,7 @@ def problem(id_problem):
         flag = True
     else:
         flag = False
-    if f'{is_problem.id}.jpg' not in os.listdir('static/img/img_problems'):
-        write_to_file(is_problem.photo, f'static/img/img_problems/{is_problem.id}.jpg')
+    recording_img(is_problem.id, is_problem.photo)
     diction = {}
     diction['id'] = is_problem.id
     diction['name'] = is_problem.name
