@@ -6,8 +6,8 @@
     border: 4px solid black; padding: 10px; background-color: rgb(28, 28, 28); font-size: large; height: {{ len_pr }}%">
         <div><form method="post">
             <button type="submit" class="btn btn{{ backlight[0] }}-secondary" name="options" value="0">По новизне</button>
-            <button type="submit" class="btn btn{{ backlight[1] }}-secondary" name="options" value="1">По актуальности</button></form></div>
             {% if not thank %}
+            <button type="submit" class="btn btn{{ backlight[1] }}-secondary" name="options" value="1">По актуальности</button></form></div>
             <form action="">
                 <select class="form-select" aria-label="Default select example" style="position: absolute; left: 35%; top: 0.2%; width: 300px;" name="lst">
                 <option selected value="0">Все регионы</option>
@@ -49,6 +49,8 @@
                 }
             </script>
             <!-- <input class="btn btn-primary" type="submit" value="Перестроить" name="submit_button"> -->
+        {% else %}
+        <button type="submit" class="btn btn{{ backlight[1] }}-secondary" name="options" value="1">По популярности</button></form></div>
         {% endif %}
         {% for i in list_problems %}
         <section>
@@ -93,6 +95,14 @@
                     <div>
                         <div style="text-align: left; padding: 10px 40px;">  {{ i['text'] }}</div>
                     </div>
+                    {% if current_user.is_authenticated and not my_problems %}
+                    <form method="post">
+                       {% if i['pub'] == 0 %}
+                        <button class="btn btn-outline-primary"  type="submit" name="th_0" value="{{ i['id'] }}">Присоединиться</button></form>
+                        {% elif i['pub'] == -1 %}
+                        <button class="btn btn-primary"  type="submit" name="th_1" value="{{ i['id'] }}">Присоединиться</button></form>
+                        {% endif %}
+                    {% endif %}
                     {% endif %}
                 </div>
             </article>

@@ -19,6 +19,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     ver_problems = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     my_thanks = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     ver_thanks = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    coordinates_map = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     modifed_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
 
