@@ -21,3 +21,10 @@ ymaps.ready(function () {
         map = new ymaps.Map('map', state);
     }
 });
+
+
+
+
+
+
+

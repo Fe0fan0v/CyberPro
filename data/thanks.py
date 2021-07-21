@@ -12,7 +12,6 @@ class Thank(SqlAlchemyBase, UserMixin, SerializerMixin):
     name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     description = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     photo = sqlalchemy.Column(sqlalchemy.BLOB, nullable=True)
-    coordinates = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     n_accession = sqlalchemy.Column(sqlalchemy.Integer, nullable=True, default=1)
     modifed_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
 

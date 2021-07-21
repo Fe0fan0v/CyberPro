@@ -2,12 +2,14 @@ from flask import redirect, render_template, Flask, request, jsonify
 from data.register import RegisterForm
 from data.login_form import LoginForm
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
+from db_work import column_length
 from data import db_session
 from data.users import User
 from data.complaints import Complaint
+from data.thanks import Thank
 from constants import *
 from PIL import Image
-from db_work import geocode
+from geocoder import geocode
 import operator
 
 app = Flask(__name__)
@@ -17,6 +19,81 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 db_session.global_init("db/site_db.db")
 db_sess = db_session.create_session()
+
+
+def shaping_dictionary(i, the_main=True, thank=False):
+    if thank:
+        print(7)
+    recording_img(i.id, i.photo)
+    diction = {}
+    if not thank:
+        recording_img(i.id, i.photo, 'img_problems')
+        if i.n_confirmation >= QUANTITY_CONFIRMATION:
+            flag = True
+        else:
+            flag = False
+        diction['lat'] = i.coordinates.split(',')[0]
+        diction['lon'] = i.coordinates.split(',')[1]
+        diction['category'] = i.category
+        diction['ver'] = flag
+        diction['color'] = DICT_COLORS_PROBLEMS[i.category]
+    else:
+        recording_img(i.id, i.photo, 'thanks')
+    diction['id'] = i.id
+    diction['name'] = i.name
+    diction['date'] = transformation_date(str(i.modifed_date))
+    if the_main:
+        diction['datetime'] = i.modifed_date
+        diction['text'] = i.description
+        if not thank:
+            diction['n_ver'] = i.n_confirmation
+            if current_user.is_authenticated:
+                user = db_sess.query(User).filter(User.email == current_user.email).first()
+                diction['pub'] = 0
+                if user.ver_problems:
+                    if str(i.id) in user.ver_problems.split(','):
+                        diction['pub'] = -1
+                if user.my_problems:
+                    if str(i.id) in user.my_problems.split(','):
+                        diction['pub'] = 1
+            # if f'{i.id}.jpg' not in os.listdir('static/img/map_problems'):
+            #     write_map(ll_spn=f"{i.coordinates.split(',')[1]},{i.coordinates.split(',')[0]}", size=f"650,450",
+            #               map_file=f'static/img/map_problems/{i.id}.jpg', point=DICT_COLORS_POINT[i.category])
+        else:
+            diction['n_ver'] = i.n_accession
+    elif not thank:
+        diction['label'] = DICT_COLORS_LABELS[i.category]
+    return diction
+
+
+def request_processing(req):
+    db_sess = db_session.create_session()
+    if 'region' in req:
+        region = req['region'].strip()
+        print([region])
+    if 'options' in req:
+        if request.form['options'] == '0':
+            flag_date = 0
+        else:
+            flag_date = 1
+        return flag_date
+    if 'prob_0' in req:
+        user = db_sess.query(User).filter(User.email == current_user.email).first()
+        problem = db_sess.query(Complaint).filter(Complaint.id == int(req["prob_0"])).first()
+        problem.n_confirmation += 1
+        if user.ver_problems:
+            user.ver_problems += f'{req["prob_0"]},'
+        else:
+            user.ver_problems = f'{req["prob_0"]},'
+        db_sess.commit()
+    elif 'prob_1' in req:
+        user = db_sess.query(User).filter(User.email == current_user.email).first()
+        problem = db_sess.query(Complaint).filter(Complaint.id == int(req["prob_1"])).first()
+        problem.n_confirmation -= 1
+        lst_problems = user.ver_problems.split(',')
+        lst_problems.remove(req['prob_1'])
+        user.ver_problems = ','.join(lst_problems)
+        db_sess.commit()
 
 
 @login_manager.user_loader
@@ -85,28 +162,9 @@ def index():
     db_sess = db_session.create_session()
     list_problems = []
     for i in db_sess.query(Complaint).all():
-        if i.n_confirmation >= QUANTITY_CONFIRMATION:
-            flag = True
-        else:
-            flag = False
-        recording_img(i.id, i.photo)
-        diction = {}
-        diction['id'] = i.id
-        diction['name'] = i.name
-        diction['lat'] = i.coordinates.split(',')[0]
-        diction['lon'] = i.coordinates.split(',')[1]
-        diction['date'] = transformation_date(str(i.modifed_date))
-        diction['category'] = i.category
-        diction['ver'] = flag
-        diction['color'] = DICT_COLORS_PROBLEMS[i.category]
-        diction['label'] = DICT_COLORS_LABELS[i.category]
+        diction = shaping_dictionary(i, False)
         width, height = Image.open(f"static/img/img_problems/{i.id}.jpg").size
-        if height / width == 0.75:
-            diction['size'] = (135, 180)
-        elif round(height / width, 3) == 0.667:
-            diction['size'] = (120, 180)
-        elif round(height / width, 3) == 1.778:
-            diction['size'] = (267, 150)
+        diction['size'] = image_scaling(width, height)
         if user_answer == '0' and diction['category'] == 'Дорожная':
             pass
         elif user_answer == '1' and diction['category'] == 'Экологическая':
@@ -132,62 +190,13 @@ def all_problems():
     region = 'все'
     if request.method == "POST":
         print(request.form)
-        if 'region' in request.form:
-            region = request.form['region'].strip()
-            print([region])
-        if 'options' in request.form:
-            if request.form['options'] == '0':
-                flag_date = 0
-            else:
-                flag_date = 1
-        if 'prob_0' in request.form:
-            user = db_sess.query(User).filter(User.email == current_user.email).first()
-            problem = db_sess.query(Complaint).filter(Complaint.id == int(request.form["prob_0"])).first()
-            problem.n_confirmation += 1
-            if user.ver_problems:
-                user.ver_problems += f'{request.form["prob_0"]},'
-            else:
-                user.ver_problems = f'{request.form["prob_0"]},'
-            db_sess.commit()
-        elif 'prob_1' in request.form:
-            user = db_sess.query(User).filter(User.email == current_user.email).first()
-            problem = db_sess.query(Complaint).filter(Complaint.id == int(request.form["prob_1"])).first()
-            problem.n_confirmation -= 1
-            lst_problems = user.ver_problems.split(',')
-            lst_problems.remove(request.form['prob_1'])
-            user.ver_problems = ','.join(lst_problems)
-            db_sess.commit()
-    if current_user.is_authenticated:
-        user = db_sess.query(User).filter(User.email == current_user.email).first()
+        s = request_processing(request.form)
+        if s:
+            flag_date = s
     lst_backlight[flag_date] = ''
     list_problems = []
     for i in db_sess.query(Complaint).all():
-        if i.n_confirmation >= QUANTITY_CONFIRMATION:
-            flag = True
-        else:
-            flag = False
-        recording_img(i.id, i.photo)
-        diction = {}
-        diction['id'] = i.id
-        diction['name'] = i.name
-        diction['text'] = i.description
-        diction['lat'] = i.coordinates.split(',')[0]
-        diction['lon'] = i.coordinates.split(',')[1]
-        diction['datetime'] = i.modifed_date
-        diction['date'] = transformation_date(str(i.modifed_date))
-        diction['category'] = i.category
-        diction['n_ver'] = i.n_confirmation
-        diction['ver'] = flag
-        diction['color'] = DICT_COLORS_PROBLEMS[i.category]
-        diction['label'] = DICT_COLORS_LABELS[i.category]
-        if current_user.is_authenticated:
-            diction['pub'] = 0
-            if user.ver_problems:
-                if str(i.id) in user.ver_problems.split(','):
-                    diction['pub'] = -1
-            if user.my_problems:
-                if str(i.id) in user.my_problems.split(','):
-                    diction['pub'] = 1
+        diction = shaping_dictionary(i)
         # print(geocode(f'{diction["lon"]},{diction["lat"]}')['metaDataProperty']['GeocoderMetaData']['text'])
         if region != 'все' and region in \
                 geocode(f'{diction["lon"]},{diction["lat"]}')['metaDataProperty']['GeocoderMetaData']['text']:
@@ -200,10 +209,9 @@ def all_problems():
         list_problems.sort(key=operator.itemgetter('n_ver'), reverse=True)
     with open('static/txt/regions.txt', 'r', encoding='utf-8') as file:
         lst = file.readlines()
-    len_pr = len(list_problems) * 90
     return render_template(
         'problems.html', list_problems=list_problems, title='Проблемы', lst_regions=lst, backlight=lst_backlight,
-        my_problems=False, url=URL, len_pr=len_pr)
+        my_problems=False, url=URL, len_pr=column_length(), thank=False)
 
 
 @app.route('/my_problems', methods=['GET', 'POST'])
@@ -215,43 +223,13 @@ def my_problems():
     user = db_sess.query(User).filter(User.email == current_user.email).first()
     if request.method == "POST":
         print(request.form)
-        if 'region' in request.form:
-            region = request.form['region'].strip()
-            print([region])
-        if 'options' in request.form:
-            if request.form['options'] == '0':
-                flag_date = 0
-            else:
-                flag_date = 1
+        s = request_processing(request.form)
+        if s:
+            flag_date = s
     lst_backlight[flag_date] = ''
     list_problems = []
     for i in db_sess.query(Complaint).all():
-        if i.n_confirmation >= QUANTITY_CONFIRMATION:
-            flag = True
-        else:
-            flag = False
-        recording_img(i.id, i.photo)
-        diction = {}
-        diction['id'] = i.id
-        diction['name'] = i.name
-        diction['text'] = i.description
-        diction['lat'] = i.coordinates.split(',')[0]
-        diction['lon'] = i.coordinates.split(',')[1]
-        diction['datetime'] = i.modifed_date
-        diction['date'] = transformation_date(str(i.modifed_date))
-        diction['category'] = i.category
-        diction['n_ver'] = i.n_confirmation
-        diction['ver'] = flag
-        diction['color'] = DICT_COLORS_PROBLEMS[i.category]
-        diction['label'] = DICT_COLORS_LABELS[i.category]
-        if current_user.is_authenticated:
-            diction['pub'] = 0
-            if user.ver_problems:
-                if str(i.id) in user.ver_problems.split(','):
-                    diction['pub'] = -1
-            if user.my_problems:
-                if str(i.id) in user.my_problems.split(','):
-                    diction['pub'] = 1
+        diction = shaping_dictionary(i)
         if str(i.id) in user.my_problems.split(','):
             if region != 'все' and region in \
                     geocode(f'{diction["lon"]},{diction["lat"]}')['metaDataProperty']['GeocoderMetaData']['text']:
@@ -264,62 +242,42 @@ def my_problems():
         list_problems.sort(key=operator.itemgetter('n_ver'), reverse=True)
     with open('static/txt/regions.txt', 'r', encoding='utf-8') as file:
         lst = file.readlines()
-    len_pr = len(list_problems) * 90
     return render_template(
         'problems.html', list_problems=list_problems, title='Проблемы', lst_regions=lst, backlight=lst_backlight,
-        my_problems=True, url=URL, len_pr=len_pr)
+        my_problems=True, url=URL, len_pr=column_length(current_user.id), thank=False)
 
 
 @app.route('/problem/<int:id_problem>', methods=['GET', 'POST'])
 def problem(id_problem):
     if request.method == "POST":
-        if 'prob_0' in request.form:
-            user = db_sess.query(User).filter(User.email == current_user.email).first()
-            problem = db_sess.query(Complaint).filter(Complaint.id == int(request.form["prob_0"])).first()
-            problem.n_confirmation += 1
-            if user.ver_problems:
-                user.ver_problems += f'{request.form["prob_0"]},'
-            else:
-                user.ver_problems = f'{request.form["prob_0"]},'
-            db_sess.commit()
-        elif 'prob_1' in request.form:
-            user = db_sess.query(User).filter(User.email == current_user.email).first()
-            problem = db_sess.query(Complaint).filter(Complaint.id == int(request.form["prob_1"])).first()
-            problem.n_confirmation -= 1
-            lst_problems = user.ver_problems.split(',')
-            lst_problems.remove(request.form['prob_1'])
-            user.ver_problems = ','.join(lst_problems)
-            db_sess.commit()
+        request_processing(request.form)
     is_problem = db_sess.query(Complaint).filter(Complaint.id == id_problem).first()
-    if is_problem.n_confirmation >= QUANTITY_CONFIRMATION:
-        flag = True
-    else:
-        flag = False
-    recording_img(is_problem.id, is_problem.photo)
-    diction = {}
-    diction['id'] = is_problem.id
-    diction['name'] = is_problem.name
-    diction['text'] = is_problem.description
-    diction['lat'] = is_problem.coordinates.split(',')[0]
-    diction['lon'] = is_problem.coordinates.split(',')[1]
-    diction['datetime'] = is_problem.modifed_date
-    diction['date'] = transformation_date(str(is_problem.modifed_date))
-    diction['category'] = is_problem.category
-    diction['n_ver'] = is_problem.n_confirmation
-    diction['ver'] = flag
-    diction['color'] = DICT_COLORS_PROBLEMS[is_problem.category]
-    diction['label'] = DICT_COLORS_LABELS[is_problem.category]
-    if current_user.is_authenticated:
-        user = db_sess.query(User).filter(User.email == current_user.email).first()
-        diction['pub'] = 0
-        if user.ver_problems:
-            if str(is_problem.id) in user.ver_problems.split(','):
-                diction['pub'] = -1
-        if user.my_problems:
-            if str(is_problem.id) in user.my_problems.split(','):
-                diction['pub'] = 1
+    diction = shaping_dictionary(is_problem)
     return render_template(
         'problem.html', diction=diction, title=is_problem.name)
+
+
+@app.route('/all_thanks', methods=["GET", 'POST'])
+def all_thanks():
+    db_sess = db_session.create_session()
+    flag_date = 0
+    lst_backlight = ['-outline', '-outline']
+    if request.method == "POST":
+        print(request.form)
+        s = request_processing(request.form)
+        if s:
+            flag_date = s
+    lst_backlight[flag_date] = ''
+    list_thanks = []
+    for i in db_sess.query(Thank).all():
+        list_thanks.append(shaping_dictionary(i, thank=True))
+    if flag_date == 0:
+        list_thanks.sort(key=operator.itemgetter('datetime'), reverse=True)
+    else:
+        list_thanks.sort(key=operator.itemgetter('n_ver'), reverse=True)
+    return render_template(
+        'problems.html', list_problems=list_thanks, title='Благодарности', backlight=lst_backlight,
+        my_problems=False, url=URL, len_pr=column_length(), thank=True)
 
 
 if __name__ == '__main__':

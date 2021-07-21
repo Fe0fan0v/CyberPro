@@ -1,28 +1,22 @@
-
-<input type="radio" class="btn-check" name="category" id="option1" value="0" autocomplete="off" checked>
-    <label class="btn btn-outline-danger" for="option1">Дорожная</label>
-<input type="radio" class="btn-check" name="category" id="option2" value="1" autocomplete="off" checked>
-    <label class="btn btn-outline-danger" for="option2">Экологическая</label>
-<input type="radio" class="btn-check" name="category" id="option3" value="2" autocomplete="off" checked>
-    <label class="btn btn-outline-danger" for="option3">ЖКХ</label>
-<input type="radio" class="btn-check" name="category" id="option4" value="3" autocomplete="off" checked>
-    <label class="btn btn-outline-danger" for="option4">Другое</label>
-<form style="position: absolute; left: 40%; top: 20%;" method="post">
-            <label>
-              <input type="radio" name="activity" value="0"/>sedentary
-            </label>
-            <label>
-              <input type="radio" name="activity" value="1"/>lightly active (1-3 days a week)
-            </label>
-            <label>
-              <input type="radio" name="activity" value="2"/>moderately active (3-5 days a week)
-            </label>
-            <br>
-             <label>
-              <input type="radio" name="activity" value="3"/>heavy exercise (6-7 days a week)
-            </label>
-            <label>
-              <input type="radio" name="activity" value="4"/>very heavy exercise (exercising twice a day or working physical job)
-            </label>
-            <input type="submit" name="submit_button">
-          </form>
+<div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" style="text-align: center;">
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+  </div>
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="../static/img/img_problems/{{ i['id'] }}.jpg" class="d-block w-100" height="50%" width="50%" alt="Фото проблемы">
+    </div>
+    <div class="carousel-item">
+      <img src="../static/img/map_problems/{{ i['id'] }}.jpg" class="d-block w-100" height="50%" width="50%" alt="Карта проблемы">
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
