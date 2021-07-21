@@ -3,9 +3,10 @@ from data.complaints import Complaint
 from data.users import User
 from data.thanks import Thank
 from data.sentenses import Sentense
-import requests
 import math
+from PIL import Image
 from constants import write_to_file
+from flask_login import current_user
 
 
 def lonlat_distance(a, b):
@@ -78,7 +79,7 @@ def add_thanks(**kwards):
     for i in ['name', 'description', 'photo']:
         if i not in list(kwards.keys()):
             return
-    #for i in db_sess.query(Thank).all():
+    # for i in db_sess.query(Thank).all():
     #    if kwards['coordinates'] == i.coordinates:
     #        thanks = db_sess.query(Thank).filter(Thank.coordinates == kwards['coordinates']).first()
     #        thanks.n_accession += 1
@@ -117,33 +118,29 @@ def add_sentense(**kwards):
     return
 
 
+def column_length(id_user='!'):
+    length = 0
+    db_session.global_init("db/users_my_site.db")
+    db_sess = db_session.create_session()
+    if id_user == '!':
+        for i in db_sess.query(Complaint).all():
+            width, height = Image.open(f"static/img/img_problems/{i.id}.jpg").size
+            if width >= height:
+                length += 58
+            else:
+                length += 108
+    else:
+        user = db_sess.query(User).filter(User.email == current_user.email).first()
+        for i in db_sess.query(Complaint).all():
+            if str(i.id) in user.my_problems.split(','):
+                width, height = Image.open(f"static/img/img_problems/{i.id}.jpg").size
+                if width >= height:
+                    length += 58
+                else:
+                    length += 108
+    return length
+
 # db_session.global_init("db/users_my_site.db")
 # add_complaint(name='Прорвало трубы', description='В подъезде вода...',
 #              photo=convert_to_binary_data('static/img/broken_road.jpg'),
 #              coordinates='54.9792438711978,60.36213526917058', category='ЖКХ')
-
-API_KEY = '40d1649f-0493-4b70-98ba-98533de7710b'
-
-
-def geocode(address):
-    # Собираем запрос для геокодера.
-    geocoder_request = f"http://geocode-maps.yandex.ru/1.x/?apikey={API_KEY}" \
-                       f"&geocode={address}&format=json"
-
-    # Выполняем запрос.
-    response = requests.get(geocoder_request)
-
-    if response:
-        # Преобразуем ответ в json-объект
-        json_response = response.json()
-    else:
-        raise RuntimeError(
-            """Ошибка выполнения запроса:
-            {request}
-            Http статус: {status} ({reason})""".format(
-                request=geocoder_request, status=response.status_code, reason=response.reason))
-
-    # Получаем первый топоним из ответа геокодера.
-    # Согласно описанию ответа он находится по следующему пути:
-    features = json_response["response"]["GeoObjectCollection"]["featureMember"]
-    return features[0]["GeoObject"] if features else None

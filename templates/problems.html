@@ -7,13 +7,14 @@
         <div><form method="post">
             <button type="submit" class="btn btn{{ backlight[0] }}-secondary" name="options" value="0">По новизне</button>
             <button type="submit" class="btn btn{{ backlight[1] }}-secondary" name="options" value="1">По актуальности</button></form></div>
+            {% if not thank %}
             <form action="">
-                <select class="form-select" aria-label="Default select example" style="position: absolute; left: 40%; top: 0.5%;" name="lsrt">
-                <option selected value="все">Все регионы</option>
+                <select class="form-select" aria-label="Default select example" style="position: absolute; left: 35%; top: 0.2%; width: 300px;" name="lst">
+                <option selected value="0">Все регионы</option>
                 {% for i in lst_regions %}
                 <option value="{{ i }}">{{ i }}</option>
                 {% endfor %}
-                    </select>
+                </select>
                 </form>
             <script>
                 const formSelect = document.querySelector('.form-select')
@@ -48,7 +49,7 @@
                 }
             </script>
             <!-- <input class="btn btn-primary" type="submit" value="Перестроить" name="submit_button"> -->
-
+        {% endif %}
         {% for i in list_problems %}
         <section>
             <article class="cell">
@@ -56,20 +57,17 @@
                     <h3>
                         <a>{{ i['name'] }}</a>
                     </h3>
-                    <!-- <div>
-                        <div>{{ i['description'] }}</div>
-                    </div> -->
+                    {% if not thank %}
                     <div>
                         <div style="color: {{ i['color'] }}">{{ i['category'] }} проблема</div>
                     </div>
+                    {% endif %}
                     <div>
                         <div>Опубликована: {{ i['date'] }}</div>
                     </div>
+                    {% if not thank %}
                     <div>
                         <img src="../static/img/img_problems/{{ i['id'] }}.jpg" style="text-align: center;" height="50%" width="50%">
-                    </div>
-                    <div>
-                        <div style="text-align: left; padding: 10px 40px;">  {{ i['text'] }}</div>
                     </div>
                     {% if i['ver'] == True %}
                         <div>
@@ -88,7 +86,14 @@
                     {% elif my_problems == True %}
                     <div style="text-align: center;">Количество подтверждений: {{ i['n_ver'] }}</div>
                     {% endif %}
-
+                    {% else %}
+                    <div>
+                        <img src="../static/img/thanks/{{ i['id'] }}.jpg" style="text-align: center;" height="50%" width="50%">
+                    </div>
+                    <div>
+                        <div style="text-align: left; padding: 10px 40px;">  {{ i['text'] }}</div>
+                    </div>
+                    {% endif %}
                 </div>
             </article>
         </section>
