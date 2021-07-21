@@ -22,8 +22,6 @@ db_sess = db_session.create_session()
 
 
 def shaping_dictionary(i, the_main=True, thank=False):
-    if thank:
-        print(7)
     recording_img(i.id, i.photo)
     diction = {}
     if not thank:
@@ -47,20 +45,18 @@ def shaping_dictionary(i, the_main=True, thank=False):
         diction['text'] = i.description
         if not thank:
             diction['n_ver'] = i.n_confirmation
-            if current_user.is_authenticated:
-                user = db_sess.query(User).filter(User.email == current_user.email).first()
-                diction['pub'] = 0
-                if user.ver_problems:
-                    if str(i.id) in user.ver_problems.split(','):
-                        diction['pub'] = -1
-                if user.my_problems:
-                    if str(i.id) in user.my_problems.split(','):
-                        diction['pub'] = 1
+
             # if f'{i.id}.jpg' not in os.listdir('static/img/map_problems'):
             #     write_map(ll_spn=f"{i.coordinates.split(',')[1]},{i.coordinates.split(',')[0]}", size=f"650,450",
             #               map_file=f'static/img/map_problems/{i.id}.jpg', point=DICT_COLORS_POINT[i.category])
         else:
             diction['n_ver'] = i.n_accession
+            if current_user.is_authenticated:
+                user = db_sess.query(User).filter(User.email == current_user.email).first()
+                diction['pub'] = 0
+                if user.ver_thanks:
+                    if str(i.id) in user.ver_thanks.split(','):
+                        diction['pub'] = -1
     elif not thank:
         diction['label'] = DICT_COLORS_LABELS[i.category]
     return diction
@@ -93,6 +89,23 @@ def request_processing(req):
         lst_problems = user.ver_problems.split(',')
         lst_problems.remove(req['prob_1'])
         user.ver_problems = ','.join(lst_problems)
+        db_sess.commit()
+    if 'th_0' in req:
+        user = db_sess.query(User).filter(User.email == current_user.email).first()
+        thank = db_sess.query(Thank).filter(Thank.id == int(req["th_0"])).first()
+        thank.n_accession += 1
+        if user.ver_thanks:
+            user.ver_thanks += f'{req["th_0"]},'
+        else:
+            user.ver_thanks = f'{req["th_0"]},'
+        db_sess.commit()
+    elif 'th_1' in req:
+        user = db_sess.query(User).filter(User.email == current_user.email).first()
+        thank = db_sess.query(Thank).filter(Thank.id == int(req["th_1"])).first()
+        thank.n_accession -= 1
+        lst_problems = user.ver_thanks.split(',')
+        lst_problems.remove(req['th_1'])
+        user.ver_thanks = ','.join(lst_problems)
         db_sess.commit()
 
 
@@ -178,8 +191,13 @@ def index():
         else:
             continue
         list_problems.append(diction)
+    coordinates = '55.753630,37.620070'
+    if current_user.is_authenticated:
+        user = db_sess.query(User).filter(User.email == current_user.email).first()
+        coordinates = user.coordinates_map
+    coordinates = coordinates.split(',')
     return render_template('geolocation.html', title='Главная', list_problems=list_problems, backlight=lst_backlight,
-                           url=URL)
+                           url=URL, lon=coordinates[0], lat=coordinates[1])
 
 
 @app.route('/all_problems', methods=["GET", 'POST'])

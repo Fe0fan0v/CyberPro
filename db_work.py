@@ -69,6 +69,7 @@ def add_complaint(**kwards):
         user.my_problems += f'{db_sess.query(Complaint).filter(Complaint.coordinates == kwards["coordinates"]).first().id},'
     else:
         user.my_problems = f'{db_sess.query(Complaint).filter(Complaint.coordinates == kwards["coordinates"]).first().id},'
+    user.coordinates_map = kwards["coordinates"]
     db_sess.commit()
     return
 

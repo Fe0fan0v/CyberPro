@@ -6,6 +6,8 @@ import telebot
 import time
 import traceback
 from db_work import add_complaint, add_thanks, add_sentense
+from data import db_session
+from data.users import User
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 DEBUG_VERSION = False
@@ -105,7 +107,7 @@ def create_output_data(user_id):
             output_data["Name"] = before_output_data[1]
             output_data["Description"] = before_output_data[2]
             output_data["Bite-photo"] = before_output_data[3]
-            #output_data["Date"] = before_output_data[4]
+            # output_data["Date"] = before_output_data[4]
         elif before_output_data[0] == "Offer":
             output_data["Name"] = before_output_data[1]
             output_data["Description"] = before_output_data[2]
@@ -120,7 +122,8 @@ def create_output_data(user_id):
             add_complaint(coordinates=f'{output_data["Location"][1]},{output_data["Location"][0]}',
                           name=output_data["Name"], description=output_data["Description"],
                           id_tele=output_data["user_id"],
-                          photo=output_data["Bite-photo"], date=output_data["Date"], category=output_data["Type"])
+                          photo=output_data["Bite-photo"], date=output_data["Date"],
+                          category=output_data["Type"])
             output_data = {}
         elif before_output_data[0] == "Gratitude":
             add_thanks(name=output_data["Name"], description=output_data["Description"],
@@ -151,7 +154,8 @@ def location(message):
 
             # -------------------------------------------------------------------------------------------------------------------------
             keyboard = types.ReplyKeyboardMarkup(row_width=3, resize_keyboard=True)
-            for i in [types.KeyboardButton(text="Дорожная 🛣"), types.KeyboardButton(text="Экологическая 🌱"),
+            for i in [types.KeyboardButton(text="Дорожная 🛣"),
+                      types.KeyboardButton(text="Экологическая 🌱"),
                       types.KeyboardButton(text="Социальная 🤷"), types.KeyboardButton(text="ЖКХ 🏚"),
                       types.KeyboardButton(text="Другое 🧩")]:
                 keyboard.add(i)
@@ -170,22 +174,26 @@ def location(message):
 
 @bot.message_handler(commands=['start'])
 def welcome(message):
-    try:
-        keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
-        button_appeal = types.KeyboardButton(text="Подать жалобу ❗")
-        button_proposal = types.KeyboardButton(text="Выдвинуть предложение  ✅")
-        button_gratitude = types.KeyboardButton(text="Выразить благодарность 💯")
-        keyboard.add(button_appeal, button_proposal, button_gratitude)
-        bot.send_message(message.chat.id, f'Здравствуйте, {message.from_user.first_name}! Выбирите действие:',
-                         reply_markup=keyboard)
-    except Exception as error_message:
-        if not DEBUG_VERSION:
-            logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
-            log = open("log.txt", "a", encoding="UTF-8")
-            log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
-            log.close()
-        else:
-            print(traceback.format_exc())
+    if check_is_tele(message.from_user.id):
+        try:
+            keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+            button_appeal = types.KeyboardButton(text="Подать жалобу ❗")
+            button_proposal = types.KeyboardButton(text="Выдвинуть предложение  ✅")
+            button_gratitude = types.KeyboardButton(text="Выразить благодарность 💯")
+            keyboard.add(button_appeal, button_proposal, button_gratitude)
+            bot.send_message(message.chat.id,
+                             f'Здравствуйте, {message.from_user.first_name}! Выберите действие:',
+                             reply_markup=keyboard)
+        except Exception as error_message:
+            if not DEBUG_VERSION:
+                logging.error(str(error_message) + "  ┋  " + time.ctime() + "\n")
+                log = open("log.txt", "a", encoding="UTF-8")
+                log.write(str(error_message) + "  ┋  " + time.ctime() + "\n")
+                log.close()
+            else:
+                print(traceback.format_exc())
+    else:
+        write_message(message, "Чтобы написать этому боту вам надо пройти регистрацию на сайте: http://localhost:8008/")
 
 
 @bot.message_handler(commands=['help'])
@@ -313,6 +321,18 @@ def start(message):
             log.close()
         else:
             print(traceback.format_exc())
+
+
+# -------------------------------------------------------------------------------------------------------------------------------------
+def check_is_tele(id_tele):
+    db_session.global_init("db/site_db.db")
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id_tele == id_tele).first()
+    print(id_tele)
+    if user:
+        return True
+    else:
+        return False
 
 
 # -------------------------------------------------------------------------------------------------------------------------------------
