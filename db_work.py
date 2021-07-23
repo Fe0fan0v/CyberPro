@@ -4,8 +4,9 @@ from data.users import User
 from data.thanks import Thank
 from data.sentenses import Sentense
 import math
+import os
 from PIL import Image
-from constants import write_to_file
+from constants import write_to_file, convert_to_binary_data
 from flask_login import current_user
 
 
@@ -145,3 +146,22 @@ def column_length(id_user='!'):
 # add_complaint(name='Прорвало трубы', description='В подъезде вода...',
 #              photo=convert_to_binary_data('static/img/broken_road.jpg'),
 #              coordinates='54.9792438711978,60.36213526917058', category='ЖКХ')
+
+
+def replacement(id_com, img, thank=False):
+    db_session.global_init("db/site_db.db")
+    db_sess = db_session.create_session()
+    if not thank:
+            complaint = db_sess.query(Complaint).filter(Complaint.id == id_com).first()
+            complaint.photo = convert_to_binary_data(f'static/img/img_problems/{img}')
+            db_sess.commit()
+            os.remove(f'static/img/img_problems/{id_com}.jpg')
+    else:
+        thank = db_sess.query(Thank).filter(Thank.id == id_com).first()
+        thank.photo = convert_to_binary_data(f'static/img/thanks/{img}')
+        db_sess.commit()
+        os.remove(f'static/img/thanks/{id_com}.jpg')
+
+
+if __name__ == '__main__':
+    replacement(1, 'цветы.jpg', thank=True)
