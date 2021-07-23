@@ -328,7 +328,6 @@ def check_is_tele(id_tele):
     db_session.global_init("db/site_db.db")
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(User.id_tele == id_tele).first()
-    print(id_tele)
     if user:
         return True
     else:

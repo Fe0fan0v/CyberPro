@@ -7,7 +7,7 @@ DICT_COLORS_LABELS = {'Дорожная': 'road_label.png', 'ЖКХ': 'survice.p
                       'Другое': 'unnamed.png'}
 DICT_COLORS_POINT = {'Дорожная': 'gr', 'ЖКХ': 'or', 'Экологическая': 'gn', 'Другое': 'rd'}
 QUANTITY_CONFIRMATION = 5
-URL = 8008
+URL = 8800
 
 
 def transformation_date(date):

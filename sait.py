@@ -45,7 +45,15 @@ def shaping_dictionary(i, the_main=True, thank=False):
         diction['text'] = i.description
         if not thank:
             diction['n_ver'] = i.n_confirmation
-
+            if current_user.is_authenticated:
+                user = db_sess.query(User).filter(User.email == current_user.email).first()
+                diction['pub'] = 0
+                if user.ver_problems:
+                    if str(i.id) in user.ver_problems.split(','):
+                        diction['pub'] = -1
+                if user.my_problems:
+                    if str(i.id) in user.my_problems.split(','):
+                        diction['pub'] = 1
             # if f'{i.id}.jpg' not in os.listdir('static/img/map_problems'):
             #     write_map(ll_spn=f"{i.coordinates.split(',')[1]},{i.coordinates.split(',')[0]}", size=f"650,450",
             #               map_file=f'static/img/map_problems/{i.id}.jpg', point=DICT_COLORS_POINT[i.category])
@@ -136,7 +144,7 @@ def reqister():
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
-        return redirect('/login')
+        return redirect('/')
     return render_template('register.html', title='Регистрация', form=form)
 
 
@@ -194,7 +202,8 @@ def index():
     coordinates = '55.753630,37.620070'
     if current_user.is_authenticated:
         user = db_sess.query(User).filter(User.email == current_user.email).first()
-        coordinates = user.coordinates_map
+        if user.coordinates_map:
+            coordinates = user.coordinates_map
     coordinates = coordinates.split(',')
     return render_template('geolocation.html', title='Главная', list_problems=list_problems, backlight=lst_backlight,
                            url=URL, lon=coordinates[0], lat=coordinates[1])
@@ -248,12 +257,13 @@ def my_problems():
     list_problems = []
     for i in db_sess.query(Complaint).all():
         diction = shaping_dictionary(i)
-        if str(i.id) in user.my_problems.split(','):
-            if region != 'все' and region in \
-                    geocode(f'{diction["lon"]},{diction["lat"]}')['metaDataProperty']['GeocoderMetaData']['text']:
-                list_problems.append(diction)
-            elif region == 'все':
-                list_problems.append(diction)
+        if user.my_problems:
+            if str(i.id) in user.my_problems.split(','):
+                if region != 'все' and region in \
+                        geocode(f'{diction["lon"]},{diction["lat"]}')['metaDataProperty']['GeocoderMetaData']['text']:
+                    list_problems.append(diction)
+                elif region == 'все':
+                    list_problems.append(diction)
     if flag_date == 0:
         list_problems.sort(key=operator.itemgetter('datetime'), reverse=True)
     else:
