@@ -134,12 +134,13 @@ def column_length(id_user='!'):
     else:
         user = db_sess.query(User).filter(User.email == current_user.email).first()
         for i in db_sess.query(Complaint).all():
-            if str(i.id) in user.my_problems.split(','):
-                width, height = Image.open(f"static/img/img_problems/{i.id}.jpg").size
-                if width >= height:
-                    length += 58
-                else:
-                    length += 108
+            if user.my_problems:
+                if str(i.id) in user.my_problems.split(','):
+                    width, height = Image.open(f"static/img/img_problems/{i.id}.jpg").size
+                    if width >= height:
+                        length += 58
+                    else:
+                        length += 108
     return length
 
 # db_session.global_init("db/users_my_site.db")
