@@ -53,7 +53,6 @@
         {% else %}
         <button type="submit" class="btn btn{{ backlight[1] }}-secondary" name="options" value="1">По популярности</button></form></div>
         {% endif %}
-
             {% for i in list_problems %}
             <section>
                 <article class="cell">
@@ -61,54 +60,59 @@
                         <h3>
                             <a>{{ i['name'] }}</a>
                         </h3>
-                        {% if not thank %}
                         <div>
                             <div style="color: {{ i['color'] }}">{{ i['category'] }} проблема</div>
                         </div>
-                        {% endif %}
                         <div>
                             <div>Опубликована: {{ i['date'] }}</div>
                         </div>
-                        {% if not thank %}
                         <div>
-                            <img src="../static/img/img_problems/{{ i['id'] }}.jpg" style="text-align: center;" height="50%" width="50%">
+                            <img src="../static/img/resolved_problems/{{ i['id'] }}.jpg" style="text-align: center;" height="50%" width="50%">
                         </div>
-                        {% if i['ver'] == True %}
-                            <div>
-                            <img src="../static/img/verified.png" style="text-align: center;" height="50%" width="50%">
-                        </div>
-                        {% endif %}
                         <div>
                             <div style="text-align: left; padding: 10px 40px;">  {{ i['text'] }}</div>
                         </div>
-                        {% if current_user.is_authenticated and not my_problems %}
-                        <form method="post">
-                           {% if i['pub'] == 0 %}
-                            <button class="btn btn-outline-primary"  type="submit" name="prob_0" value="{{ i['id'] }}">Подтвердить</button></form>
-                            {% elif i['pub'] == -1 %}
-                            <button class="btn btn-primary"  type="submit" name="prob_1" value="{{ i['id'] }}">Подтвержена вами</button></form>
-                            {% else %}
-                            <button class="btn btn-danger"  type="submit" disabled>Опубликована</button></form>
-                            {% endif %}
-                        {% elif my_problems == True %}
-                        <div style="text-align: center;">Количество подтверждений: {{ i['n_ver'] }}</div>
-                        {% endif %}
+                        {% if  not i['rating'] %}
+                        <h4>Данные об рейтинге отсутствуют</h4>
                         {% else %}
-                        <div>
-                            <img src="../static/img/thanks/{{ i['id'] }}.jpg" style="text-align: center;" height="50%" width="50%">
+                        <h4 style="padding: 0px;">Рейтинг</nobr></h4>
+                        <link rel="stylesheet" type="text/css" href="../static/css/star.css"/>
+                        <div class="rating-result">
+                            {% for j in range(i['rating']) %}
+                        	    <span class="active"></span>
+                            {% endfor %}
+                            {% for j in range(5 - i['rating']) %}
+                        	    <span></span>
+                            {% endfor %}
                         </div>
-                        <div>
-                            <div style="text-align: left; padding: 10px 40px;">  {{ i['text'] }}</div>
-                        </div>{% endif %}
-                        {% if current_user.is_authenticated and not my_problems and thank %}
-                        <form method="post">
-                           {% if i['pub'] == 0 %}
-                            <button class="btn btn-outline-primary"  type="submit" name="th_0" value="{{ i['id'] }}">Присоединиться</button></form>
-                            {% elif i['pub'] == -1 %}
-                            <button class="btn btn-primary"  type="submit" name="th_1" value="{{ i['id'] }}">Вы присоединились</button></form>
-                            {% endif %}
+                        {% endif %}
+                        <form method="post" style="margin: 10px 0px;">
+                        {% if i['pub'] == 1 %}
+
+                        <link rel="stylesheet" type="text/css" href="../static/css/star.css"/>
+                        <div class="rating-result">
+                            <h4 style="padding: 0px;"><nobr>Ваша оценка</nobr></h4>
+                            {% for j in range(i['my_rating']) %}
+                        	    <span class="active"></span>
+                            {% endfor %}
+                            {% for j in range(5 - i['my_rating']) %}
+                        	    <span></span>
+                            {% endfor %}
+                        </div>
+                        {% elif current_user.is_authenticated %}
+                            <form action="">
+                            <select class="form-select" aria-label="Default select example" name="rating" style="width: 70px; position: absolute; top: 47%; left: 35%;">
+                                <option selected value="1">1</option>
+                                <option selected value="2">2</option>
+                                <option selected value="3">3</option>
+                                <option selected value="4">4</option>
+                                <option selected value="5">5</option>
+                            </select><button class="btn btn-outline-danger"  type="submit" name="problem" value="{{ i['id'] }}">Оценить</button>
+                            </form>
 
                         {% endif %}
+                        <form method="post" action="http://localhost:{{ url }}/problem/{{ i['id_problem'] }}">
+                            <button class="btn btn-outline-primary">Перейти к проблеме</button></form>
                     </div>
                 </article>
             </section>
@@ -116,7 +120,7 @@
         {% else %}
                     <div style="text-align: center; padding: 15px;">
                         <h3>
-                            <a>Вы ещё не опубликовали ни одной проблемы</a>
+                            <a>По данному запросу нет решённых проблем</a>
                         </h3>
                     </div>
         {% endif %}

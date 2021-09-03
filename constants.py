@@ -64,4 +64,15 @@ def write_map(ll_spn, size='450,450', map_file='map.png', zoom='15', point='rd')
         print("Ошибка записи временного файла:", ex)
         sys.exit(2)
 
+
+def height_len(width, height):
+    if width / height == 0.5625:
+        return 108
+    elif width / height == 1.5:
+        return 58
+    elif width / height == 58 / 33:
+        return 68
+    elif height / width == 0.75:
+        return 52
+
 # show_map(ll_spn='60.14439582824708,55.14184738080156')
