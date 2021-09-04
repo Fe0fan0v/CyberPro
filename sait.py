@@ -7,6 +7,7 @@ from data import db_session
 from data.users import User
 from data.complaints import Complaint
 from data.thanks import Thank
+from data.resolved_problem import Resolved
 from constants import *
 from PIL import Image
 from geocoder import geocode
@@ -21,10 +22,9 @@ db_session.global_init("db/site_db.db")
 db_sess = db_session.create_session()
 
 
-def shaping_dictionary(i, the_main=True, thank=False):
-    recording_img(i.id, i.photo)
+def shaping_dictionary(i, the_main=True, thank=False, resolved=False):
     diction = {}
-    if not thank:
+    if not thank and not resolved:
         recording_img(i.id, i.photo, 'img_problems')
         if i.n_confirmation >= QUANTITY_CONFIRMATION:
             flag = True
@@ -35,15 +35,38 @@ def shaping_dictionary(i, the_main=True, thank=False):
         diction['category'] = i.category
         diction['ver'] = flag
         diction['color'] = DICT_COLORS_PROBLEMS[i.category]
-    else:
+    elif thank:
         recording_img(i.id, i.photo, 'thanks')
+    elif resolved:
+        recording_img(i.id, i.photo, 'resolved_problems')
+        if i.rating:
+            n_star = 0
+            for j in i.rating.split(','):
+                if j != '':
+                    n_star += int(j)
+            lst = i.users.split(',')
+            while '' in lst:
+                lst.remove('')
+            n_star = round(n_star / (len(lst)), 0)
+            diction['rating'] = int(n_star)
+            if current_user.is_authenticated:
+                user = db_sess.query(User).filter(User.email == current_user.email).first()
+                if str(user.id) in i.users.split(','):
+                    print(i.rating.split(','))
+                    diction['my_rating'] = int(i.rating.split(',')[i.users.split(',').index(str(user.id))])
+        else:
+            diction['rating'] = None
+        diction['id_problem'] = i.problem
+        problem = db_sess.query(Complaint).filter(Complaint.id == i.problem).first()
+        diction['category'] = problem.category
+        diction['color'] = DICT_COLORS_PROBLEMS[problem.category]
     diction['id'] = i.id
     diction['name'] = i.name
     diction['date'] = transformation_date(str(i.modifed_date))
     if the_main:
         diction['datetime'] = i.modifed_date
         diction['text'] = i.description
-        if not thank:
+        if not thank and not resolved:
             diction['n_ver'] = i.n_confirmation
             if current_user.is_authenticated:
                 user = db_sess.query(User).filter(User.email == current_user.email).first()
@@ -57,7 +80,7 @@ def shaping_dictionary(i, the_main=True, thank=False):
             # if f'{i.id}.jpg' not in os.listdir('static/img/map_problems'):
             #     write_map(ll_spn=f"{i.coordinates.split(',')[1]},{i.coordinates.split(',')[0]}", size=f"650,450",
             #               map_file=f'static/img/map_problems/{i.id}.jpg', point=DICT_COLORS_POINT[i.category])
-        else:
+        elif thank:
             diction['n_ver'] = i.n_accession
             if current_user.is_authenticated:
                 user = db_sess.query(User).filter(User.email == current_user.email).first()
@@ -65,6 +88,13 @@ def shaping_dictionary(i, the_main=True, thank=False):
                 if user.ver_thanks:
                     if str(i.id) in user.ver_thanks.split(','):
                         diction['pub'] = -1
+        elif resolved:
+            if current_user.is_authenticated:
+                user = db_sess.query(User).filter(User.email == current_user.email).first()
+                diction['pub'] = 0
+                if i.users:
+                    if str(user.id) in i.users.split(','):
+                        diction['pub'] = 1
     elif not thank:
         diction['label'] = DICT_COLORS_LABELS[i.category]
     return diction
@@ -282,7 +312,7 @@ def problem(id_problem):
     is_problem = db_sess.query(Complaint).filter(Complaint.id == id_problem).first()
     diction = shaping_dictionary(is_problem)
     return render_template(
-        'problem.html', diction=diction, title=is_problem.name)
+        'problem.html', diction=diction, title=is_problem.name, len_pr=column_length(id_problem=is_problem.id))
 
 
 @app.route('/all_thanks', methods=["GET", 'POST'])
@@ -305,7 +335,40 @@ def all_thanks():
         list_thanks.sort(key=operator.itemgetter('n_ver'), reverse=True)
     return render_template(
         'problems.html', list_problems=list_thanks, title='Благодарности', backlight=lst_backlight,
-        my_problems=False, url=URL, len_pr=column_length(), thank=True)
+        my_problems=False, url=URL, len_pr=column_length(cl=Thank), thank=True)
+
+
+@app.route('/resolved_problems', methods=["GET", 'POST'])
+def resolved_problems():
+    db_sess = db_session.create_session()
+    if request.method == "POST":
+        user = db_sess.query(User).filter(User.email == current_user.email).first()
+        problem = db_sess.query(Resolved).filter(Resolved.id == int(request.form['problem'])).first()
+        if str(user.id) not in problem.users.split(','):
+            problem.users += str(user.id) + ','
+            problem.rating += request.form['rating'] + ','
+            db_sess.commit()
+            print(request.form)
+    flag_date = 0
+    lst_backlight = ['-outline', '-outline']
+    if request.method == "POST":
+        print(request.form)
+        s = request_processing(request.form)
+        if s:
+            flag_date = s
+    lst_backlight[flag_date] = ''
+    list_resolved = []
+    for i in db_sess.query(Resolved).all():
+        list_resolved.append(shaping_dictionary(i, resolved=True))
+    print(list_resolved)
+    # доделать
+    # if flag_date == 0:
+    #     list_resolved.sort(key=operator.itemgetter('datetime'), reverse=True)
+    # else:
+    #     list_resolved.sort(key=operator.itemgetter('n_ver'), reverse=True)
+    return render_template(
+        'resolved_problems.html', list_problems=list_resolved, title='Решённые проблемы', backlight=lst_backlight,
+        my_problems=False, url=URL, len_pr=column_length(cl=Thank))
 
 
 if __name__ == '__main__':

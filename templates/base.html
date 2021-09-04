@@ -29,17 +29,19 @@
             <a class="btn btn-outline-success" href="/login" style="height: 35px; height: 35px; position: absolute; left: 8%; top: 10px;">Войти</a>
         </p>
         {% endif %}
-        <div style="text-align:center;">
-        <a class="nav-item nav-link active" href="/" style="position: absolute; top: 5px; left: 750px; font-size: 14pt;">Главная</a>
-        <a class="nav-item nav-link" href="/all_problems" style="position: absolute; top: 5px; left: 850px; font-size: 14pt;">Проблемы</a>
+        <div>
         {% if current_user.is_authenticated %}
-        <a class="nav-item nav-link" href="/my_problems" style="position: absolute; top: 5px; left: 980px; font-size: 14pt;">Мои проблемы</a>
-        <a class="nav-item nav-link" href="/all_thanks" style="position: absolute; top: 5px; left: 1150px; font-size: 14pt;">Благодарности</a>
+            <a class="nav-item nav-link active" href="/" style="position: absolute; top: 5px; left: 700px; font-size: 14pt;">Главная</a>
+        <a class="nav-item nav-link" href="/all_problems" style="position: absolute; top: 5px; left: 800px; font-size: 14pt;">Проблемы</a>
+        <a class="nav-item nav-link" href="/my_problems" style="position: absolute; top: 5px; left: 930px; font-size: 14pt;">Мои проблемы</a>
+        <a class="nav-item nav-link" href="/all_thanks" style="position: absolute; top: 5px; left: 1100px; font-size: 14pt;">Благодарности</a>
+        <a class="nav-item nav-link" href="/resolved_problems" style="position: absolute; top: 5px; left: 1250px; font-size: 14pt;">Решённые проблемы</a>
         {% else %}
+            <a class="nav-item nav-link active" href="/" style="position: absolute; top: 5px; left: 750px; font-size: 14pt;">Главная</a>
+        <a class="nav-item nav-link" href="/all_problems" style="position: absolute; top: 5px; left: 850px; font-size: 14pt;">Проблемы</a>
             <a class="nav-item nav-link" href="/all_thanks" style="position: absolute; top: 5px; left: 980px; font-size: 14pt;">Благодарности</a>
-        </div>
-        {% endif %}
-
+            <a class="nav-item nav-link" href="/resolved_problems" style="position: absolute; top: 5px; left: 1120px; font-size: 14pt;">Решённые проблемы</a>
+        {% endif %}</div>
     </nav>
 </header>
 <!-- Begin page content -->
