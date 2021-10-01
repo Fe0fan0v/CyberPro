@@ -1,4 +1,4 @@
-from flask import redirect, render_template, Flask, request, jsonify
+from flask import redirect, render_template, Flask, request, jsonify, make_response
 from data.register import RegisterForm
 from data.login_form import LoginForm
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
@@ -371,6 +371,34 @@ def resolved_problems():
         my_problems=False, url=URL, len_pr=column_length(cl=Thank))
 
 
+@app.route('/api/login', methods=['POST'])
+def api_login():
+    if request.method == 'POST':
+        if not request.json:
+            return make_response(jsonify({'error': 'Empty request'}), 400)
+        elif not all(key in request.json for key in
+                     ['email', 'password']):
+            return make_response(jsonify({'error': 'Bad request'}), 400)
+        else:
+            email, password = request.json['email'], request.json['password']
+            db_sess = db_session.create_session()
+            user = db_sess.query(User).filter(User.email == email).first()
+            if user and user.check_password(password):
+                return make_response(jsonify({'status': 'OK', 'id': user.id}), 201)
+            if not user:
+                return make_response(jsonify({'error': 'User not registered'}), 404)
+            return make_response(jsonify({'error': 'Invalid password or email'}), 401)
+        # elif find_in_base('email', request.json['email'] ):
+        #     return make_response(jsonify({'error': 'Useralready exists'}), 409)
+        # else:
+        #     hashed_password = generate_password_hash(password)
+        #     user = User(str(uuid.uuid4()), email, hashed_password)
+        #     user.add_to_base()
+        #     return make_response(jsonify({'status': 'OK'}), 201)
+
+
 if __name__ == '__main__':
     db_session.global_init("db/site_db.db")
     app.run('localhost', URL)
+
+
