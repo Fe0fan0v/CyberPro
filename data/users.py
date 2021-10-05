@@ -14,7 +14,6 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     surname = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     email = sqlalchemy.Column(sqlalchemy.String, index=True, unique=True, nullable=True)
-    id_tele = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     my_problems = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     ver_problems = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     my_thanks = sqlalchemy.Column(sqlalchemy.String, nullable=True)
