@@ -12,6 +12,7 @@ from constants import *
 from PIL import Image
 from geocoder import geocode
 import operator
+from requests import post
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'ryasov_secret_key'
@@ -101,6 +102,7 @@ def shaping_dictionary(i, the_main=True, thank=False, resolved=False):
 
 
 def request_processing(req):
+    print(req)
     db_sess = db_session.create_session()
     if 'region' in req:
         region = req['region'].strip()
@@ -168,8 +170,7 @@ def reqister():
         user = User(
             name=form.name.data,
             surname=form.surname.data,
-            email=form.email.data,
-            id_tele=form.id_tele.data
+            email=form.email.data
         )
         user.set_password(form.password.data)
         db_sess.add(user)
@@ -388,17 +389,65 @@ def api_login():
             if not user:
                 return make_response(jsonify({'error': 'User not registered'}), 404)
             return make_response(jsonify({'error': 'Invalid password or email'}), 401)
-        # elif find_in_base('email', request.json['email'] ):
-        #     return make_response(jsonify({'error': 'Useralready exists'}), 409)
-        # else:
-        #     hashed_password = generate_password_hash(password)
-        #     user = User(str(uuid.uuid4()), email, hashed_password)
-        #     user.add_to_base()
-        #     return make_response(jsonify({'status': 'OK'}), 201)
+
+
+@app.route('/api/register', methods=['POST'])
+def api_register():
+    if request.method == 'POST':
+        if not request.json:
+            return make_response(jsonify({'error': 'Empty request'}), 400)
+        elif not all(key in request.json for key in
+                     ['email', 'password', 'name', 'surname']):
+            return make_response(jsonify({'error': 'Bad request'}), 400)
+        else:
+            email, password = request.json['email'], request.json['password']
+            name, surname = request.json['name'], request.json['surname']
+            db_sess = db_session.create_session()
+            if db_sess.query(User).filter(User.email == email).first():
+                return make_response(jsonify({'error': 'User already exists'}), 409)
+            user = User(
+                name=name,
+                surname=surname,
+                email=email
+            )
+            user.set_password(password)
+            db_sess.add(user)
+            db_sess.commit()
+            return make_response(jsonify({'status': 'register successful', 'id': user.id}), 201)
+
+
+@app.route('/api/all_problems', methods=['GET', 'POST'])
+def api_all_problem():
+    if request.method == 'GET':
+        db_sess = db_session.create_session()
+        list_problems = []
+        for i in db_sess.query(Complaint).all()[:15]:
+            diction = shaping_dictionary(i)
+            list_problems.append(diction)
+        return make_response(jsonify({'problems': list_problems, 'status': 'OK'}), 201)
+    if request.method == 'POST':
+        id_problem, verified, user_id = request.json['id'], request.json['verified'], request.json['user_id']
+        db_sess = db_session.create_session()
+        problem = db_sess.query(Complaint).filter(Complaint.id == id_problem).first()
+        if not problem:
+            return make_response(jsonify({'error': 'No problem'}), 401)
+        user = db_sess.query(User).filter(User.id == user_id).first()
+        problem = db_sess.query(Complaint).filter(Complaint.id == id_problem).first()
+        if verified:
+            problem.n_confirmation += 1
+            if user.ver_problems:
+                user.ver_problems += f'{id_problem},'
+            else:
+                user.ver_problems = f'{id_problem},'
+        else:
+            problem.n_confirmation -= 1
+            lst_problems = user.ver_problems.split(',')
+            lst_problems.remove(id_problem)
+            user.ver_problems = ','.join(lst_problems)
+        db_sess.commit()
+        return make_response(jsonify({'status': 'OK'}), 201)
 
 
 if __name__ == '__main__':
     db_session.global_init("db/site_db.db")
-    app.run('localhost', URL)
-
-
+    app.run()
