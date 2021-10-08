@@ -21,15 +21,12 @@ def global_init(db_file):
     print(f"Подключение к базе данных по адресу {conn_str}")
 
     engine = sa.create_engine(conn_str, echo=False)
-    print('engine created')
     __factory = orm.sessionmaker(bind=engine)
-    print('factory created')
 
     # noinspection PyUnresolvedReferences
     from . import __all_models
 
     SqlAlchemyBase.metadata.create_all(engine)
-    print('all models created')
 
 
 def create_session() -> Session:

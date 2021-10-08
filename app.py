@@ -205,7 +205,6 @@ def logout():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    db_session.global_init("db/site_db.db")
     user_answer = '4'
     lst_backlight = ['-outline', '-outline', '-outline', '-outline', '-outline']
     if request.method == 'POST':
