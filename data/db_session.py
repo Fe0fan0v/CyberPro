@@ -25,9 +25,7 @@ def global_init(db_file):
 
     # noinspection PyUnresolvedReferences
     from . import __all_models
-
     SqlAlchemyBase.metadata.create_all(engine)
-    print('created all models')
 
 
 def create_session() -> Session:
