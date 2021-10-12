@@ -12,6 +12,7 @@ from constants import *
 from PIL import Image
 from geocoder import geocode
 import operator
+from db_work import add_complaint
 from requests import post
 
 app = Flask(__name__)
@@ -448,6 +449,22 @@ def api_all_problem():
         return make_response(jsonify({'status': 'OK'}), 201)
 
 
+@app.route('/api/add_problem', methods=['POST'])
+def api_add_problem():
+    if request.method == 'POST':
+        if not request.json:
+            return make_response(jsonify({'error': 'Empty request'}), 400)
+        elif not all(key in request.json for key in
+                     ['name', 'description', 'coordinates', 'photo', 'user_id']):
+            return make_response(jsonify({'error': 'Bad request'}), 400)
+        else:
+            name, description, category = request.json['name'], request.json['description'], request.json['category']
+            coordinates, photo, user_id = request.json['coordinates'], request.json['photo'], request.json['user_id']
+            id_problem = add_complaint(name=name, description=description, coordinates=coordinates,
+                                       photo=photo, user_id=user_id, category=category)
+            if int(id_problem):
+                return make_response(jsonify({'id_problem': id_problem}), 201)
+
+
 if __name__ == '__main__':
-    db_session.global_init("db/site_db.db")
     app.run()

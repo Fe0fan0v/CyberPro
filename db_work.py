@@ -36,9 +36,8 @@ def lonlat_distance(a, b):
 def add_complaint(**kwards):
     db_session.global_init("db/site_db.db")
     db_sess = db_session.create_session()
-    for i in ['name', 'description', 'coordinates', 'photo', 'date']:
-        if i not in list(kwards.keys()):
-            return
+    if not all(key in kwards for key in ['name', 'description', 'coordinates', 'photo', 'user_id']):
+        return 'Not all keys for problem'
     for i in db_sess.query(Complaint).all():
         if lonlat_distance((float(kwards['coordinates'].split(',')[0]), float(kwards['coordinates'].split(',')[1])),
                            (float(i.coordinates.split(',')[0]), float(i.coordinates.split(',')[1]))) <= 20 and \
@@ -47,33 +46,22 @@ def add_complaint(**kwards):
             db_sess.commit()
             return
     # write_to_file(kwards['photo'], f'static/img/img_problems/{list(db_sess.query(Complaint).all())[-1].id + 1}.jpg')
-
-    if 'category' not in list(kwards.keys()):
-        complaint = Complaint(
+    complaint = Complaint(
             name=kwards['name'],
             description=kwards['description'],
             coordinates=kwards['coordinates'],
             photo=kwards['photo'],
-            category='Другое'
-        )
-    else:
-        complaint = Complaint(
-            name=kwards['name'],
-            description=kwards['description'],
-            coordinates=kwards['coordinates'],
-            photo=kwards['photo'],
-            category=kwards['category'].split()[0]
+            category=kwards['category']
         )
     db_sess.add(complaint)
-
-    user = db_sess.query(User).filter(User.id_tele == kwards['id_tele']).first()
+    user = db_sess.query(User).filter(User.id == kwards['user_id']).first()
     if user.my_problems:
-        user.my_problems += f'{db_sess.query(Complaint).filter(Complaint.coordinates == kwards["coordinates"]).first().id},'
+        user.my_problems += f'{complaint.id},'
     else:
-        user.my_problems = f'{db_sess.query(Complaint).filter(Complaint.coordinates == kwards["coordinates"]).first().id},'
+        user.my_problems = f'{complaint.id},'
     user.coordinates_map = kwards["coordinates"]
     db_sess.commit()
-    return
+    return complaint.id
 
 
 def add_thanks(**kwards):
@@ -126,7 +114,7 @@ def column_length(id_user='!', id_problem='!', cl=Complaint):
     name_pape = 'img_problems'
     if cl == Thank:
         name_pape = 'thanks'
-    db_session.global_init("db/users_my_site.db")
+    db_session.global_init("db/site_db.db")
     db_sess = db_session.create_session()
     if id_user == '!':
         for i in db_sess.query(cl).all():
@@ -186,6 +174,7 @@ def add_resolved(**kwards):
     return
 
 
-if __name__ == '__main__':
-    add_resolved(name='Пляж чист!', description='Пляж был растищен волонтёрами, собрано 12 мешков мусора.',
-                 problem=4, photo=convert_to_binary_data('static/img/thanks/цветы.jpg'))
+#if __name__ == '__main__':
+#    add_resolved(name='Пляж чист!', description='Пляж был растищен волонтёрами, собрано 12 мешков мусора.',
+#                 problem=4, photo=convert_to_binary_data('static/img/thanks/цветы.jpg'))
+#

@@ -76,3 +76,4 @@ def height_len(width, height):
         return 52
 
 # show_map(ll_spn='60.14439582824708,55.14184738080156')
+#print(type(convert_to_binary_data('static/img/img_problems/13.jpg')))
