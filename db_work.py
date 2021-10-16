@@ -44,7 +44,8 @@ def add_complaint(**kwards):
                 kwards['category'] == i.category:
             i.n_confirmation += 1
             db_sess.commit()
-            return
+            return 'Lj,fd'
+    print(6)
     # write_to_file(kwards['photo'], f'static/img/img_problems/{list(db_sess.query(Complaint).all())[-1].id + 1}.jpg')
     complaint = Complaint(
             name=kwards['name'],

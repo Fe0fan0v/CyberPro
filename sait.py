@@ -13,6 +13,7 @@ from PIL import Image
 from geocoder import geocode
 import operator
 from db_work import add_complaint
+import base64
 from requests import post
 
 app = Flask(__name__)
@@ -452,18 +453,36 @@ def api_all_problem():
 @app.route('/api/add_problem', methods=['POST'])
 def api_add_problem():
     if request.method == 'POST':
+        if request.files:
+            write_to_file(request.files['file'].read(), "example.jpg")
+            return make_response(jsonify({'status': 'Image recorded'}), 200)
+
         if not request.json:
             return make_response(jsonify({'error': 'Empty request'}), 400)
         elif not all(key in request.json for key in
-                     ['name', 'description', 'coordinates', 'photo', 'user_id']):
+                     ['name', 'description', 'coordinates', 'user_id']):
             return make_response(jsonify({'error': 'Bad request'}), 400)
         else:
             name, description, category = request.json['name'], request.json['description'], request.json['category']
-            coordinates, photo, user_id = request.json['coordinates'], request.json['photo'], request.json['user_id']
+            coordinates, user_id = request.json['coordinates'], request.json['user_id']
+            photo = convert_to_binary_data("example.jpg")
             id_problem = add_complaint(name=name, description=description, coordinates=coordinates,
                                        photo=photo, user_id=user_id, category=category)
-            if int(id_problem):
+
+            if id_problem:
                 return make_response(jsonify({'id_problem': id_problem}), 201)
+            else:
+                return make_response(jsonify({'status': 'ОШибочка'}), 200)
+
+
+@app.route('/api/all_users', methods=['GET'])
+def api_all_users():
+    if request.method == 'GET':
+        db_sess = db_session.create_session()
+        list_users = []
+        for i in db_sess.query(User).all():
+            list_users.append(i.email)
+        return make_response(jsonify({'users': list_users, 'status': 'OK'}), 201)
 
 
 if __name__ == '__main__':
