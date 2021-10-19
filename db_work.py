@@ -34,7 +34,7 @@ def lonlat_distance(a, b):
 
 
 def add_complaint(**kwards):
-    db_session.global_init("db/site_db.sqlite")
+    db_session.global_init("db/site_db.db")
     db_sess = db_session.create_session()
     for i in ['name', 'description', 'coordinates', 'photo', 'date']:
         if i not in list(kwards.keys()):
@@ -77,7 +77,7 @@ def add_complaint(**kwards):
 
 
 def add_thanks(**kwards):
-    db_session.global_init("db/site_db.sqlite")
+    db_session.global_init("db/site_db.db")
     db_sess = db_session.create_session()
     for i in ['name', 'description', 'photo']:
         if i not in list(kwards.keys()):
@@ -103,7 +103,6 @@ def add_thanks(**kwards):
 
 
 def add_sentense(**kwards):
-    db_session.global_init("db/site_db.sqlite")
     db_sess = db_session.create_session()
     for i in ['description', 'file', 'name']:
         if i not in list(kwards.keys()):
@@ -127,7 +126,7 @@ def column_length(id_user='!', id_problem='!', cl=Complaint):
     name_pape = 'img_problems'
     if cl == Thank:
         name_pape = 'thanks'
-    db_session.global_init("db/site_db.sqlite")
+    db_session.global_init("db/users_my_site.db")
     db_sess = db_session.create_session()
     if id_user == '!':
         for i in db_sess.query(cl).all():
@@ -156,7 +155,7 @@ def column_length(id_user='!', id_problem='!', cl=Complaint):
 
 
 def replacement(id_com, img, thank=False):
-    db_session.global_init("db/site_db.sqlite")
+    db_session.global_init("db/site_db.db")
     db_sess = db_session.create_session()
     if not thank:
         complaint = db_sess.query(Complaint).filter(Complaint.id == id_com).first()
@@ -171,7 +170,7 @@ def replacement(id_com, img, thank=False):
 
 
 def add_resolved(**kwards):
-    db_session.global_init("db/site_db.sqlite")
+    db_session.global_init("db/site_db.db")
     db_sess = db_session.create_session()
     for i in ['name', 'description', 'problem', 'photo']:
         if i not in list(kwards.keys()):

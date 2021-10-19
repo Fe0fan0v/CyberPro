@@ -1,6 +1,7 @@
 import os
 import sys
 import requests
+import base64
 
 DICT_COLORS_PROBLEMS = {'Дорожная': 'grey', 'ЖКХ': 'orange', 'Экологическая': 'green', 'Другое': 'red'}
 DICT_COLORS_LABELS = {'Дорожная': 'road_label.png', 'ЖКХ': 'survice.png', 'Экологическая': 'ecology.png',
@@ -76,3 +77,4 @@ def height_len(width, height):
         return 52
 
 # show_map(ll_spn='60.14439582824708,55.14184738080156')
+#print(type(convert_to_binary_data('static/img/img_problems/13.jpg')))
