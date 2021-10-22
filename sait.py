@@ -164,6 +164,7 @@ def reqister():
         if form.password.data != form.password_again.data:
             return render_template('register.html', title='Регистрация', form=form,
                                    message="Пароли не совпадают.")
+
         db_sess = db_session.create_session()
         if db_sess.query(User).filter(User.email == form.email.data).first():
             return render_template('register.html', title='Регистрация', form=form,
@@ -176,7 +177,6 @@ def reqister():
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
-        login_user(user)
         return redirect('/')
     return render_template('register.html', title='Регистрация', form=form)
 
@@ -207,6 +207,7 @@ def logout():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    db_session.global_init("db/site_db.db")
     user_answer = '4'
     lst_backlight = ['-outline', '-outline', '-outline', '-outline', '-outline']
     if request.method == 'POST':
