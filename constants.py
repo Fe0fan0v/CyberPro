@@ -3,10 +3,10 @@ import sys
 import requests
 import base64
 
-DICT_COLORS_PROBLEMS = {'Дорожная': 'grey', 'ЖКХ': 'orange', 'Экологическая': 'green', 'Другое': 'red'}
+DICT_COLORS_PROBLEMS = {'Дорожная': 'grey', 'ЖКХ': 'orange', 'Экологическая': 'green', 'Другая': 'red'}
 DICT_COLORS_LABELS = {'Дорожная': 'road_label.png', 'ЖКХ': 'survice.png', 'Экологическая': 'ecology.png',
-                      'Другое': 'unnamed.png'}
-DICT_COLORS_POINT = {'Дорожная': 'gr', 'ЖКХ': 'or', 'Экологическая': 'gn', 'Другое': 'rd'}
+                      'Другая': 'unnamed.png'}
+DICT_COLORS_POINT = {'Дорожная': 'gr', 'ЖКХ': 'or', 'Экологическая': 'gn', 'Другая': 'rd'}
 QUANTITY_CONFIRMATION = 5
 URL = 5000
 
@@ -78,3 +78,5 @@ def height_len(width, height):
 
 # show_map(ll_spn='60.14439582824708,55.14184738080156')
 #print(type(convert_to_binary_data('static/img/img_problems/13.jpg')))
+if __name__ == '__main__':
+    write_to_file(base64.decodebytes("[B@3300cbd"), '1.jpg')
