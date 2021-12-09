@@ -2,7 +2,6 @@ from flask import redirect, render_template, Flask, request, jsonify, make_respo
 from data.register import RegisterForm
 from data.login_form import LoginForm
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
-from db_work import column_length
 from data import db_session
 from data.users import User
 from data.complaints import Complaint
@@ -169,8 +168,9 @@ def reqister():
         if db_sess.query(User).filter(User.email == form.email.data).first():
             return render_template('register.html', title='Регистрация', form=form,
                                    message="Такой пользователь уже существует")
+        name = ' '.join(form.name.data.split())
         user = User(
-            name=form.name.data,
+            name=name,
             surname=form.surname.data,
             email=form.email.data
         )
@@ -207,6 +207,7 @@ def logout():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    ip = request.remote_addr
     db_session.global_init("db/site_db.db")
     user_answer = '4'
     lst_backlight = ['-outline', '-outline', '-outline', '-outline', '-outline']
@@ -271,7 +272,7 @@ def all_problems():
         lst = file.readlines()
     return render_template(
         'problems.html', list_problems=list_problems, title='Проблемы', lst_regions=lst, backlight=lst_backlight,
-        my_problems=False, url=URL, len_pr=column_length(), thank=False)
+        my_problems=False, url=URL, thank=False)
 
 
 @app.route('/my_problems', methods=['GET', 'POST'])
@@ -305,7 +306,7 @@ def my_problems():
         lst = file.readlines()
     return render_template(
         'problems.html', list_problems=list_problems, title='Проблемы', lst_regions=lst, backlight=lst_backlight,
-        my_problems=True, url=URL, len_pr=column_length(current_user.id), thank=False)
+        my_problems=True, url=URL, thank=False)
 
 
 @app.route('/problem/<int:id_problem>', methods=['GET', 'POST'])
@@ -315,7 +316,7 @@ def problem(id_problem):
     is_problem = db_sess.query(Complaint).filter(Complaint.id == id_problem).first()
     diction = shaping_dictionary(is_problem)
     return render_template(
-        'problem.html', diction=diction, title=is_problem.name, len_pr=column_length(id_problem=is_problem.id))
+        'problem.html', diction=diction, title=is_problem.name)
 
 
 @app.route('/all_thanks', methods=["GET", 'POST'])
@@ -338,7 +339,7 @@ def all_thanks():
         list_thanks.sort(key=operator.itemgetter('n_ver'), reverse=True)
     return render_template(
         'problems.html', list_problems=list_thanks, title='Благодарности', backlight=lst_backlight,
-        my_problems=False, url=URL, len_pr=column_length(cl=Thank), thank=True)
+        my_problems=False, url=URL, thank=True)
 
 
 @app.route('/resolved_problems', methods=["GET", 'POST'])
@@ -371,7 +372,7 @@ def resolved_problems():
     #     list_resolved.sort(key=operator.itemgetter('n_ver'), reverse=True)
     return render_template(
         'resolved_problems.html', list_problems=list_resolved, title='Решённые проблемы', backlight=lst_backlight,
-        my_problems=False, url=URL, len_pr=column_length(cl=Thank))
+        my_problems=False, url=URL)
 
 
 @app.route('/api/login', methods=['POST'])
@@ -453,26 +454,26 @@ def api_all_problem():
 @app.route('/api/add_problem', methods=['POST'])
 def api_add_problem():
     if request.method == 'POST':
-        if request.files:
-            write_to_file(request.files['file'].read(), "example.jpg")
-            return make_response(jsonify({'status': 'Image recorded'}), 200)
-
         if not request.json:
             return make_response(jsonify({'error': 'Empty request'}), 400)
         elif not all(key in request.json for key in
-                     ['name', 'description', 'coordinates', 'user_id']):
+                     ['name', 'description', 'coordinates', 'user_id', 'file']):
             return make_response(jsonify({'error': 'Bad request'}), 400)
         else:
+            print(request.json['file'][-10:])
             name, description, category = request.json['name'], request.json['description'], request.json['category']
             coordinates, user_id = request.json['coordinates'], request.json['user_id']
-            photo = convert_to_binary_data("example.jpg")
+            bytes = base64.b64decode(request.json['file'][1:-1])
+            filename = request.json['filename']
+            with open(f'static/img/example.jpg', "wb") as imageFile:
+                imageFile.write(bytes)
             id_problem = add_complaint(name=name, description=description, coordinates=coordinates,
-                                       photo=photo, user_id=user_id, category=category)
+                                       photo=bytes, user_id=user_id, category=category)
 
             if id_problem:
                 return make_response(jsonify({'id_problem': id_problem}), 201)
             else:
-                return make_response(jsonify({'status': 'ОШибочка'}), 200)
+                return make_response(jsonify({'status': 'Ошибочка'}), 200)
 
 
 @app.route('/api/all_users', methods=['GET'])

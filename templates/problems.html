@@ -2,21 +2,21 @@
 
 {% block content %}
     <meta charset="UTF-8">
-    <div style="position: absolute; top: 6%; left:25%; width: 50%; color: white;
-    border: 4px solid black; padding: 10px; background-color: rgb(28, 28, 28); font-size: large; height: {{ len_pr }}%">
+
+    <div style="position: absolute; top: 6.2%; left:25%; width: 50%;
+    background-color: rgba(28, 28, 28, 0); font-size: large; color: white;">
+
         {% if list_problems != [] %}
-        <div><form method="post">
+        <div style="padding: 10px; background-color: rgb(28, 28, 28); font-size: large;"><form method="post">
             <button type="submit" class="btn btn{{ backlight[0] }}-secondary" name="options" value="0">По новизне</button>
             {% if not thank %}
-            <button type="submit" class="btn btn{{ backlight[1] }}-secondary" name="options" value="1">По актуальности</button></form></div>
-            <form action="">
-                <select class="form-select" aria-label="Default select example" style="position: absolute; left: 35%; top: 0.2%; width: 300px;" name="lst">
+            <button type="submit" class="btn btn{{ backlight[1] }}-secondary" name="options" value="1">По актуальности</button>
+            <select class="form-select" aria-label="Default select example" style="position: absolute; left: 65%; top: 0.2%; width: 300px;" name="lst">
                 <option selected value="0">Все регионы</option>
                 {% for i in lst_regions %}
                 <option value="{{ i }}">{{ i }}</option>
                 {% endfor %}
                 </select>
-                </form>
             <script>
                 const formSelect = document.querySelector('.form-select')
                 const form = document.querySelector('form')
@@ -34,11 +34,8 @@
                 const onLoadError = (data) => {
                     console.log('err', data);
                 }
-                // выводы в консоль можно будет удалить
-
                 const loadData = function(data, onSuccess, onError){
                 fetch('http://localhost:{{ url }}/all_problems', {
-                    // Выше, где https:// нужно написать адрес, куда отправляются данные
                 method: 'POST',
                 body: data,
                  }).then(onSuccess).catch(onError)};
@@ -49,11 +46,9 @@
 
                 }
             </script>
-            <!-- <input class="btn btn-primary" type="submit" value="Перестроить" name="submit_button"> -->
         {% else %}
-        <button type="submit" class="btn btn{{ backlight[1] }}-secondary" name="options" value="1">По популярности</button></form></div>
-        {% endif %}
-
+        <button type="submit" class="btn btn{{ backlight[1] }}-secondary" name="options" value="1">По популярности</button>
+        {% endif %}</form></div>
             {% for i in list_problems %}
             <section>
                 <article class="cell">
@@ -92,6 +87,7 @@
                             {% endif %}
                         {% elif my_problems == True %}
                         <div style="text-align: center;">Количество подтверждений: {{ i['n_ver'] }}</div>
+                        <button class="btn btn-info" type="button">Редактировать</button>
                         {% endif %}
                         {% else %}
                         <div>

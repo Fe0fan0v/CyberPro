@@ -44,9 +44,8 @@ def add_complaint(**kwards):
                 kwards['category'] == i.category:
             i.n_confirmation += 1
             db_sess.commit()
-            return 'Lj,fd'
+            return 'Похожая проблема'
     print(6)
-    # write_to_file(kwards['photo'], f'static/img/img_problems/{list(db_sess.query(Complaint).all())[-1].id + 1}.jpg')
     complaint = Complaint(
             name=kwards['name'],
             description=kwards['description'],
@@ -71,12 +70,6 @@ def add_thanks(**kwards):
     for i in ['name', 'description', 'photo']:
         if i not in list(kwards.keys()):
             return
-    # for i in db_sess.query(Thank).all():
-    #    if kwards['coordinates'] == i.coordinates:
-    #        thanks = db_sess.query(Thank).filter(Thank.coordinates == kwards['coordinates']).first()
-    #        thanks.n_accession += 1
-    #        db_sess.commit()
-    #        return
     if db_sess.query(Thank).all():
         write_to_file(kwards['photo'], f'static/img/thanks/{len(list(db_sess.query(Thank).all())) + 1}.jpg')
     else:
@@ -137,10 +130,6 @@ def column_length(id_user='!', id_problem='!', cl=Complaint):
     return length
 
 
-# db_session.global_init("db/users_my_site.db")
-# add_complaint(name='Прорвало трубы', description='В подъезде вода...',
-#              photo=convert_to_binary_data('static/img/broken_road.jpg'),
-#              coordinates='54.9792438711978,60.36213526917058', category='ЖКХ')
 
 
 def replacement(id_com, img, thank=False):
