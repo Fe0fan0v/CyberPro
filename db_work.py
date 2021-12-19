@@ -45,7 +45,6 @@ def add_complaint(**kwards):
             i.n_confirmation += 1
             db_sess.commit()
             return 'Похожая проблема'
-    print(6)
     complaint = Complaint(
             name=kwards['name'],
             description=kwards['description'],

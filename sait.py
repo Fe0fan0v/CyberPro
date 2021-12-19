@@ -426,6 +426,8 @@ def api_all_problem():
         list_problems = []
         for i in db_sess.query(Complaint).all()[:15]:
             diction = shaping_dictionary(i)
+            diction['photo'] = str(base64.b64encode(i.photo))[1:-1]
+
             list_problems.append(diction)
         return make_response(jsonify({'problems': list_problems, 'status': 'OK'}), 201)
     if request.method == 'POST':
@@ -460,11 +462,9 @@ def api_add_problem():
                      ['name', 'description', 'coordinates', 'user_id', 'file']):
             return make_response(jsonify({'error': 'Bad request'}), 400)
         else:
-            print(request.json['file'][-10:])
             name, description, category = request.json['name'], request.json['description'], request.json['category']
             coordinates, user_id = request.json['coordinates'], request.json['user_id']
-            bytes = base64.b64decode(request.json['file'][1:-1])
-            filename = request.json['filename']
+            bytes = base64.b64decode(request.json['file'])
             with open(f'static/img/example.jpg', "wb") as imageFile:
                 imageFile.write(bytes)
             id_problem = add_complaint(name=name, description=description, coordinates=coordinates,
