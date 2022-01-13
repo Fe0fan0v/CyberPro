@@ -486,5 +486,13 @@ def api_all_users():
         return make_response(jsonify({'users': list_users, 'status': 'OK'}), 201)
 
 
+@app.route('/api/user', methods=["GET"])
+def api_id_user():
+    if request.method == 'GET':
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.id == int(request.json['user_id'])).first()
+        return make_response(user.get_all_values())
+
+
 if __name__ == '__main__':
     app.run()
