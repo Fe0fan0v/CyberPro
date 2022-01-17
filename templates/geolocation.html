@@ -38,7 +38,7 @@ function init () {
                         {% else %}
                         balloonContentBody: '<img src="static/img/img_problems/{{ i['id'] }}.jpg" height="{{ i['size'][1] }}" width="{{ i['size'][0] }}"> <br/> ',
                         {% endif %}
-                        balloonContentFooter: 'Проблема обнародована:<br/> {{ i['date'] }}<br/><a href = "http://localhost:{{ url }}/problem/{{ i['id'] }}">Узнать поподробнее</a>',}
+                        balloonContentFooter: 'Проблема обнародована:<br/> {{ i['date'] }}<br/><a href = "https://people-eye.herokuapp.com/problem/{{ i['id'] }}">Узнать поподробнее</a>',}
                         ,{
                         iconLayout: 'default#image',
                         // Путь до нашей картинки
