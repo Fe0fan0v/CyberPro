@@ -27,15 +27,18 @@
     }
     p.button-register { text-align: center;}
     p.title-form {text-align: center; font-weight: bold;}
-    p.message-register { color: rgb(255, 165, 0); font-size: 20pt; text-align: center; margin-top: 10%;}
+    p.message-form { color: rgb(255, 165, 0); font-size: 20pt; text-align: center; margin-top: 10%;}
+    h1.title {text-align: center;}
+    h1.title-map { margin-top: 3%; text-align: center; font-weight: bold;}
+    #map { margin-top: 5%; margin-left: auto; margin-right: auto; width: 70%; height: 600px; }
+    #form-category { text-align: center; margin-top: 4%;}
 </style>
 </head>
 <body>
 <header>
-    <nav class="navbar navbar-dark bg-dark" style="height: 0.05555%;">
+    <nav class="navbar navbar-dark bg-dark" style="height: 60px;">
         {% if current_user.is_authenticated %}
         <p><a class="navbar-brand" href="/logout" style="position: absolute; left: 2%; top: 5px;">{{ current_user.name }} {{ current_user.surname }}</a></p>
-
         {% else %}
         <p>
             <a class="btn btn-outline-warning" href="/register" style="height: 35px; position: absolute; left: 1%; top: 10px;">Регистрация</a>
@@ -45,7 +48,7 @@
         <div class="link-header">
         {% if current_user.is_authenticated %}
             <a class="nav-item nav-link active" href="/" style="position: absolute; top: 5px; left: 600px;">Главная</a>
-        <a class="nav-item nav-link" href="/all_problems" style="position: absolute; top: 5px; left: 700px; font-size: 14pt;">Проблемы</a>
+        <a class="nav-item nav-link" href="/all_problems" style="position: absolute; top: 5px; left: 700px;">Проблемы</a>
         <a class="nav-item nav-link" href="/my_problems" style="position: absolute; top: 5px; left: 830px;">Мои проблемы</a>
         <a class="nav-item nav-link" href="/all_thanks" style="position: absolute; top: 5px; left: 1000px;">Благодарности</a>
         <a class="nav-item nav-link" href="/resolved_problems" style="position: absolute; top: 5px; left: 1150px;">Решённые проблемы</a>
@@ -53,7 +56,7 @@
             <a class="nav-item nav-link active" href="/" style="position: absolute; top: 5px; left: 650px;">Главная</a>
         <a class="nav-item nav-link" href="/all_problems" style="position: absolute; top: 5px; left: 750px;">Проблемы</a>
             <a class="nav-item nav-link" href="/all_thanks" style="position: absolute; top: 5px; left: 870px;">Благодарности</a>
-            <a class="nav-item nav-link" href="/resolved_problems" style="margin-left: -300%; padding-top: 5px;">Решённые проблемы</a>
+            <a class="nav-item nav-link" href="/resolved_problems" style="margin-left: -305%; padding-top: 5px;">Решённые проблемы</a>
         {% endif %}</div>
     </nav>
 </header>

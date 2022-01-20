@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 align="center">{{ title }}</h1>
+<h1 class="title">{{ title }}</h1>
 
 <form action="" method="post">
     {{ form.hidden_tag() }}
@@ -52,6 +52,6 @@
     {% endfor %}
     </p>
     <p class="button-register">{{ form.submit(type="submit", class="btn btn-success") }}</p>
-    <p class="message-register">{{message}}</p>
+    <p class="message-form">{{message}}</p>
 </form>
 {% endblock %}
