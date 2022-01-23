@@ -32,7 +32,7 @@
                    console.log('err', data);
                }
                const loadData = function(data, onSuccess, onError){
-               fetch('http://localhost:{{ url }}/all_problems', {
+               fetch('/all_problems', {
                method: 'POST',
                body: data,
                 }).then(onSuccess).catch(onError)};
