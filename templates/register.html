@@ -1,61 +1,57 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 align="center">{{ title }}</h1>
+<h1 class="title">{{ title }}</h1>
 
 <form action="" method="post">
     {{ form.hidden_tag() }}
     {{ form.csrf_token }}
-    <p style="text-align: center;">
+    <p class="title-form">
         {{ form.name.label }}<br>
-        {{ form.name(class="form-control", style="width: 40%; margin-left: 30%;") }}<br>
+        {{ form.name(class="form-control") }}<br>
         {% for error in form.name.errors %}
     <p class="alert alert-danger" role="alert">
         {{ error }}
     </p>
     {% endfor %}
     </p>
-    <p style="text-align: center;">
+    <p class="title-form">
         {{ form.surname.label }}<br>
-        {{ form.surname(class="form-control", style="width: 40%; margin-left: 30%;") }}<br>
+        {{ form.surname(class="form-control") }}<br>
         {% for error in form.surname.errors %}
     <p class="alert alert-danger" role="alert">
         {{ error }}
     </p>
     {% endfor %}
     </p>
-    <p style="text-align: center;">
+    <p class="title-form">
         {{ form.email.label }}<br>
-        {{ form.email(class="form-control", type="email", style="width: 40%; margin-left: 30%;") }}<br>
+        {{ form.email(class="form-control", type="email") }}<br>
         {% for error in form.email.errors %}
     <p class="alert alert-danger" role="alert">
         {{ error }}
     </p>
     {% endfor %}
     </p>
-    <p style="text-align: center;">
+    <p class="title-form">
         {{ form.password.label }}<br>
-        {{ form.password(class="form-control", type="password", style="width: 40%; margin-left: 30%;") }}<br>
+        {{ form.password(class="form-control", type="password") }}<br>
         {% for error in form.password.errors %}
     <p class="alert alert-danger" role="alert">
         {{ error }}
     </p>
     {% endfor %}
     </p>
-    <p style="text-align: center;">
+    <p class="title-form">
         {{ form.password_again.label }}<br>
-        {{ form.password_again(class="form-control", type="password", style="width: 40%; margin-left: 30%;") }}<br>
+        {{ form.password_again(class="form-control", type="password") }}<br>
         {% for error in form.password_again.errors %}
     <p class="alert alert-danger" role="alert">
         {{ error }}
     </p>
     {% endfor %}
     </p>
-    <p>{{ form.submit(type="submit", class="btn btn-success", style="position: absolute; left: 46%;") }}</p>
-    {% if message == "Пароли не совпадают."%}
-        <p style="position: absolute; left: 42%; top: 90%; color: rgb(255, 165, 0); font-size: 20pt;">{{message}}</p>
-    {% else %}
-        <p style="position: absolute; left: 38%; top: 90%; color: rgb(255, 165, 0); font-size: 20pt;">{{message}}</p>
-    {% endif %}
+    <p class="button-register">{{ form.submit(type="submit", class="btn btn-success") }}</p>
+    <p class="message-form">{{message}}</p>
 </form>
 {% endblock %}
