@@ -190,11 +190,11 @@ def login():
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
+        color = 'red'
         if not user:
-            return render_template('login.html', title='Авторизация', message="Вы не зарегистрированы",
-                                   form=form, color='yellow', left='42')
+            color = 'yellow'
         return render_template('login.html', title='Авторизация', message="Неправильный логин или пароль",
-                               color='red', form=form, left='39')
+                               color=color, form=form)
     return render_template('login.html', title='Авторизация', form=form)
 
 

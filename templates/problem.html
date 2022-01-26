@@ -2,40 +2,27 @@
 
 {% block content %}
     <meta charset="UTF-8">
-    <div style="position: absolute; top: 20%; left:25%; width: 50%; color: white;
-     padding: 50px 10px; background-color: rgba(28, 28, 28, 0); font-size: large;">
+    <div class="object-area">
         <section>
             <article class="cell">
                 <div style="text-align: center;">
-                    <h3>
-                        <a>{{ diction['name'] }}</a>
-                    </h3>
-                    <div>
+                    <h3>{{ diction['name'] }}</h3>
                         <div style="color: {{ diction['color'] }}">{{ diction['category'] }} проблема</div>
-                    </div>
-                    <div>
                         <div>Опубликована: {{ diction['date'] }}</div>
-                    </div>
-                    <div>
-                        <img src="../static/img/img_problems/{{ diction['id'] }}.jpg" style="text-align: center;" height="50%" width="50%">
-                    </div>
-                    <div>
-                        <div style="text-align: left; padding: 10px 40px;">  {{ diction['text'] }}</div>
-                    </div>
+                        <img src="../static/img/img_problems/{{ diction['id'] }}.jpg" class="centr">
+                        <p class="text-problem">  {{ diction['text'] }}</p>
                     {% if diction['ver'] == True %}
-                        <div>
-                        <img src="../static/img/verified.png" style="text-align: center;" height="50%" width="50%">
-                    </div>
+                        <img src="../static/img/verified.png" class="centr">
                     {% endif %}
                     {% if current_user.is_authenticated%}
                     <form method="post">
                        {% if diction['pub'] == 0 %}
-                        <button class="btn btn-outline-primary"  type="submit" name="prob_0" value="{{ diction['id'] }}">Подтвердить</button></form>
+                        <button class="btn btn-outline-primary"  type="submit" name="prob_0" value="{{ diction['id'] }}">Подтвердить</button>
                         {% elif diction['pub'] == -1 %}
-                        <button class="btn btn-primary"  type="submit" name="prob_1" value="{{ diction['id'] }}">Подтвердить</button></form>
+                        <button class="btn btn-primary"  type="submit" name="prob_1" value="{{ diction['id'] }}">Подтвердить</button>
                         {% else %}
-                        <button class="btn btn-danger"  type="submit" disabled>Опубликована</button></form>
-                        {% endif %}
+                        <button class="btn btn-danger"  type="submit" disabled>Опубликована</button>
+                        {% endif %}</form>
                     {% endif %}
 
                 </div>

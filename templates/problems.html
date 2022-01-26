@@ -3,15 +3,14 @@
 {% block content %}
     <meta charset="UTF-8">
 
-    <div style="position: absolute; top: 6.2%; left:25%; width: 50%;
-    background-color: rgba(28, 28, 28, 0); font-size: large; color: white;">
+    <div class="object-area" style="margin-top: -4%;">
 
         {% if list_problems != [] %}
-        <div style="padding: 10px; background-color: rgb(28, 28, 28); font-size: large;"><form method="post">
+        <div style="padding: 10px; background-color: rgb(28, 28, 28);"><form method="post">
             <button type="submit" class="btn btn{{ backlight[0] }}-secondary" name="options" value="0">По новизне</button>
             {% if not thank %}
             <button type="submit" class="btn btn{{ backlight[1] }}-secondary" name="options" value="1">По актуальности</button>
-            <select class="form-select" aria-label="Default select example" style="position: absolute; left: 65%; top: 0.2%; width: 300px;" name="lst">
+            <select class="form-select" aria-label="Default select example" name="lst">
                 <option selected value="0">Все регионы</option>
                 {% for i in lst_regions %}
                 <option value="{{ i }}">{{ i }}</option>
@@ -32,10 +31,10 @@
                     console.log('load', data);
                 }
                 const onLoadError = (data) => {
-                    console.log('err', data);
+                  console.log('err', data);
                 }
                 const loadData = function(data, onSuccess, onError){
-                fetch('http://localhost:{{ url }}/all_problems', {
+                fetch('/all_problems', {
                 method: 'POST',
                 body: data,
                  }).then(onSuccess).catch(onError)};
@@ -53,49 +52,31 @@
             <section>
                 <article class="cell">
                     <div style="text-align: center;">
-                        <h3>
-                            <a>{{ i['name'] }}</a>
-                        </h3>
+                        <h3>{{ i['name'] }}</h3>
                         {% if not thank %}
-                        <div>
                             <div style="color: {{ i['color'] }}">{{ i['category'] }} проблема</div>
-                        </div>
                         {% endif %}
-                        <div>
                             <div>Опубликована: {{ i['date'] }}</div>
-                        </div>
+                        <img src="../static/img/img_problems/{{ i['id'] }}.jpg" class="centr">
+                         <p class="text-problem">{{ i['text'] }}</p>
                         {% if not thank %}
-                        <div>
-                            <img src="../static/img/img_problems/{{ i['id'] }}.jpg" style="text-align: center;" height="50%" width="50%">
-                        </div>
                         {% if i['ver'] == True %}
-                            <div>
-                            <img src="../static/img/verified.png" style="text-align: center;" height="50%" width="50%">
-                        </div>
+                            <img src="../static/img/verified.png" class="centr">
                         {% endif %}
-                        <div>
-                            <div style="text-align: left; padding: 10px 40px;">  {{ i['text'] }}</div>
-                        </div>
                         {% if current_user.is_authenticated and not my_problems %}
                         <form method="post">
                            {% if i['pub'] == 0 %}
-                            <button class="btn btn-outline-primary"  type="submit" name="prob_0" value="{{ i['id'] }}">Подтвердить</button></form>
+                            <button class="btn btn-outline-primary"  type="submit" name="prob_0" value="{{ i['id'] }}">Подтвердить</button>
                             {% elif i['pub'] == -1 %}
-                            <button class="btn btn-primary"  type="submit" name="prob_1" value="{{ i['id'] }}">Подтвержена вами</button></form>
+                            <button class="btn btn-primary"  type="submit" name="prob_1" value="{{ i['id'] }}">Подтвержена вами</button>
                             {% else %}
-                            <button class="btn btn-danger"  type="submit" disabled>Опубликована</button></form>
-                            {% endif %}
+                            <button class="btn btn-danger"  type="submit" disabled>Опубликована</button>
+                            {% endif %}</form>
                         {% elif my_problems == True %}
-                        <div style="text-align: center;">Количество подтверждений: {{ i['n_ver'] }}</div>
+                        <p style="text-align: center;">Количество подтверждений: {{ i['n_ver'] }}</p>
                         <button class="btn btn-info" type="button">Редактировать</button>
                         {% endif %}
-                        {% else %}
-                        <div>
-                            <img src="../static/img/thanks/{{ i['id'] }}.jpg" style="text-align: center;" height="50%" width="50%">
-                        </div>
-                        <div>
-                            <div style="text-align: left; padding: 10px 40px;">  {{ i['text'] }}</div>
-                        </div>{% endif %}
+                        {% endif %}
                         {% if current_user.is_authenticated and not my_problems and thank %}
                         <form method="post">
                            {% if i['pub'] == 0 %}
@@ -110,10 +91,8 @@
             </section>
             {% endfor %}
         {% else %}
-                    <div style="text-align: center; padding: 15px;">
-                        <h3>
-                            <a>Вы ещё не опубликовали ни одной проблемы</a>
-                        </h3>
+                    <div class="empty-field">
+                        <h3>Вы ещё не опубликовали ни одной проблемы</h3>
                     </div>
         {% endif %}
         </div>
