@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- <div style="hight: 100%; width: 100%; align: center;"> -->
+<h1 class="title-map">Карта проблем</h1>
+{% set lst_names = ['Дорожная', 'Экологическая', 'ЖКХ', 'Другая', 'Все'] %}
+<form id="form-category" method="post">
+    {% for i in range(5) %}
+    <button class="btn btn{{ backlight[i] }}-danger" type="submit" name="category" value="{{ i }}" style="margin: 15px;">{{ lst_names[i] }}</button>
+    {% endfor %}
+          </form>
+<div id="map"></div>
+<script src="http://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+<script type="text/javascript">
+ymaps.ready(init);
+
+function init () {
+    var myMap = new ymaps.Map("map", {
+        // Центр карты, указываем коордианты
+        center:[{{ lon }}, {{ lat }}],
+        // Масштаб, тут все просто
+        zoom: 9,
+        // Отключаем все элементы управления
+        controls: ['zoomControl', 'fullscreenControl']
+    });
+
+    var myGeoObjects = [];
+
+    // Наша метка, указываем коордианты
+    {% for i in list_problems %}
+        myGeoObjects[{{ loop.index - 1 }}] = new ymaps.Placemark([{{ i['lat'] }}, {{ i['lon'] }}],{
+                        balloonContentHeader: '<a href = "#">{{ i['name'] }}</a><br>' +
+                        '<span style="color: {{ i['color'] }};">{{ i['category'] }} проблема</span>',
+                        {% if i['ver'] == True %}
+                        balloonContentBody: '<img src="static/img/img_problems/{{ i['id'] }}.jpg" height="{{ i['size'][1] }}" width="{{ i['size'][0] }}"> <br/> ' +
+                        '<img src="static/img/verified.png" height="32" width="150"> <br/> ',
+                        {% else %}
+                        balloonContentBody: '<img src="static/img/img_problems/{{ i['id'] }}.jpg" height="{{ i['size'][1] }}" width="{{ i['size'][0] }}"> <br/> ',
+                        {% endif %}
+                        balloonContentFooter: 'Проблема обнародована:<br/> {{ i['date'] }}<br/><a href = "/problem/{{ i['id'] }}">Узнать поподробнее</a>',}
+                        ,{
+                        iconLayout: 'default#image',
+                        // Путь до нашей картинки
+                        iconImageHref: 'static/img/{{ i['label'] }}',
+                        // Размер по ширине и высоте
+                        iconImageSize: [50, 50],
+                        // Смещение левого верхнего угла иконки относительно
+                        // её «ножки» (точки привязки).
+                        iconImageOffset: [-25, -45]
+    });
+    {% endfor %}
+    var clusterer = new ymaps.Clusterer({
+        clusterDisableClickZoom: false,
+        clusterOpenBalloonOnClick: false,
+    });
+
+    clusterer.add(myGeoObjects);
+    myMap.geoObjects.add(clusterer);
+}</script>
+{% endblock %}

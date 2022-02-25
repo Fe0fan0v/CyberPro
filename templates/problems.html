@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <meta charset="UTF-8">
+
+    <div class="object-area" style="margin-top: -4%;">
+
+        {% if list_problems != [] %}
+        <div class="fon-problem"><form method="post">
+            <button type="submit" class="btn btn{{ backlight[0] }}-secondary" name="options" value="0">По новизне</button>
+            {% if not thank %}
+            <button type="submit" class="btn btn{{ backlight[1] }}-secondary" name="options" value="1">По актуальности</button>
+            <select class="form-select" aria-label="Default select example" name="lst" id="form-select">
+                <option selected value="0">Все регионы</option>
+                {% for i in lst_regions %}
+                <option value="{{ i }}">{{ i }}</option>
+                {% endfor %}
+                </select>
+            <script>
+                const formSelect = document.querySelector('.form-select')
+                const form = document.querySelector('form')
+                // если форм несколько, то лучше добавить поиск элемента так: document.querySelector('.класс')
+                // или document.querySelector('#id')
+
+                formSelect.addEventListener('input', function(evt){
+                    evt.preventDefault();
+
+                    submitOption()
+                })
+                const onLoadSuccess = (data) => {
+                    console.log('load', data);
+                }
+                const onLoadError = (data) => {
+                  console.log('err', data);
+                }
+                const loadData = function(data, onSuccess, onError){
+                fetch('/all_problems', {
+                method: 'POST',
+                body: data,
+                 }).then(onSuccess).catch(onError)};
+
+                const submitOption = function(){
+                    const dataForm =  new FormData(form);
+                    loadData(dataForm, onLoadSuccess, onLoadError);
+
+                }
+            </script>
+        {% else %}
+        <button type="submit" class="btn btn{{ backlight[1] }}-secondary" name="options" value="1">По популярности</button>
+        {% endif %}</form></div>
+            {% for i in list_problems %}
+            <section>
+                <article class="cell">
+                    <div style="text-align: center;">
+                        <h3>{{ i['name'] }}</h3>
+                        {% if not thank %}
+                            <div style="color: {{ i['color'] }}">{{ i['category'] }} проблема</div>
+                        {% endif %}
+                            <div>Опубликована: {{ i['date'] }}</div>
+                        <img src="../static/img/img_problems/{{ i['id'] }}.jpg" class="centr">
+                         <p class="text-problem">{{ i['text'] }}</p>
+                        {% if not thank %}
+                        {% if i['ver'] == True %}
+                            <img src="../static/img/verified.png" class="centr">
+                        {% endif %}
+                        {% if current_user.is_authenticated and not my_problems %}
+                        <form method="post">
+                           {% if i['pub'] == 0 %}
+                            <button class="btn btn-outline-primary"  type="submit" name="prob_0" value="{{ i['id'] }}">Подтвердить</button>
+                            {% elif i['pub'] == -1 %}
+                            <button class="btn btn-primary"  type="submit" name="prob_1" value="{{ i['id'] }}">Подтвержена вами</button>
+                            {% else %}
+                            <button class="btn btn-danger"  type="submit" disabled>Опубликована</button>
+                            {% endif %}</form>
+                        {% elif my_problems == True %}
+                        <p style="text-align: center;">Количество подтверждений: {{ i['n_ver'] }}</p>
+                        <button class="btn btn-info" type="button">Редактировать</button>
+                        {% endif %}
+                        {% endif %}
+                        {% if current_user.is_authenticated and not my_problems and thank %}
+                        <form method="post">
+                           {% if i['pub'] == 0 %}
+                            <button class="btn btn-outline-primary"  type="submit" name="th_0" value="{{ i['id'] }}">Присоединиться</button>
+                            {% elif i['pub'] == -1 %}
+                            <button class="btn btn-primary"  type="submit" name="th_1" value="{{ i['id'] }}">Вы присоединились</button>
+                            {% endif %}
+                            </form>
+                        {% endif %}
+                    </div>
+                </article>
+            </section>
+            {% endfor %}
+        {% else %}
+                    <div class="empty-field">
+                        <h3>Вы ещё не опубликовали ни одной проблемы</h3>
+                    </div>
+        {% endif %}
+        </div>
+{% endblock %}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Выпадающий список</title>
+</head>
+<body>
+    <form action="">
+        <select class="form-select" aria-label="Default select example" style="position: absolute; left: 50%; top: 50%;" name="lst">
+                <option selected value="1">1</option>
+                <option value="2">2</option>
+            </select>
+        </form>
+    <script>
+        const formSelect = document.querySelector('.form-select')
+        const form = document.querySelector('form')
+        // если форм несколько, то лучше добавить поиск элемента так: document.querySelector('.класс')
+        // или document.querySelector('#id')
+
+        formSelect.addEventListener('input', function(evt){
+            evt.preventDefault();
+
+            submitOption()
+        })
+        const onLoadSuccess = (data) => {
+            console.log('load', data);
+        }
+        const onLoadError = (data) => {
+            console.log('err', data);
+        }
+        // выводы в консоль можно будет удалить 
+
+        const loadData = function(data, onSuccess, onError){
+        fetch('http://localhost:8800', {
+            // Выше, где https:// нужно написать адрес, куда отправляются данные
+        method: 'POST',
+        body: data,
+         }).then(onSuccess).catch(onError)};
+
+        const submitOption = function(){
+            const dataForm =  new FormData(form);
+            loadData(dataForm, onLoadSuccess, onLoadError);
+
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <meta charset="UTF-8">
+    <div class="object-area">
+        <section>
+            <article class="cell">
+                <div style="text-align: center;">
+                    <h3>{{ diction['name'] }}</h3>
+                        <div style="color: {{ diction['color'] }}">{{ diction['category'] }} проблема</div>
+                        <div>Опубликована: {{ diction['date'] }}</div>
+                        <img src="../static/img/img_problems/{{ diction['id'] }}.jpg" class="centr">
+                        <p class="text-problem">  {{ diction['text'] }}</p>
+                    {% if diction['ver'] == True %}
+                        <img src="../static/img/verified.png" class="centr">
+                    {% endif %}
+                    {% if current_user.is_authenticated%}
+                    <form method="post">
+                       {% if diction['pub'] == 0 %}
+                        <button class="btn btn-outline-primary"  type="submit" name="prob_0" value="{{ diction['id'] }}">Подтвердить</button>
+                        {% elif diction['pub'] == -1 %}
+                        <button class="btn btn-primary"  type="submit" name="prob_1" value="{{ diction['id'] }}">Подтвердить</button>
+                        {% else %}
+                        <button class="btn btn-danger"  type="submit" disabled>Опубликована</button>
+                        {% endif %}</form>
+                    {% endif %}
+
+                </div>
+            </article>
+        </section>
+        </div>
+{% endblock %}
