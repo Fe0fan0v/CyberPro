@@ -486,12 +486,24 @@ def api_all_users():
         return make_response(jsonify({'users': list_users, 'status': 'OK'}), 201)
 
 
-@app.route('/api/user', methods=["GET"])
+@app.route('/api/user', methods=["POST"])
 def api_id_user():
-    if request.method == 'GET':
+    if request.method == 'POST':
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.id == int(request.json['user_id'])).first()
         return make_response(user.get_all_values())
+
+
+@app.route('/api/my_problems', methods=["POST"])
+def api_my_problems():
+    if request.method == 'POST':
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.id == int(request.json['user_id'])).first()
+        lst = []
+        for i in user.my_problems.split(','):
+            if i != '':
+                lst.append(int(i))
+        return make_response({'my_problems': lst})
 
 
 if __name__ == '__main__':

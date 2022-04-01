@@ -6,11 +6,11 @@
     <div class="object-area" style="margin-top: -4%;">
 
         {% if list_problems != [] %}
-        <div style="padding: 10px; background-color: rgb(28, 28, 28);"><form method="post">
+        <div class="fon-problem"><form method="post">
             <button type="submit" class="btn btn{{ backlight[0] }}-secondary" name="options" value="0">По новизне</button>
             {% if not thank %}
             <button type="submit" class="btn btn{{ backlight[1] }}-secondary" name="options" value="1">По актуальности</button>
-            <select class="form-select" aria-label="Default select example" name="lst">
+            <select class="form-select" aria-label="Default select example" name="lst" id="form-select">
                 <option selected value="0">Все регионы</option>
                 {% for i in lst_regions %}
                 <option value="{{ i }}">{{ i }}</option>
@@ -80,11 +80,11 @@
                         {% if current_user.is_authenticated and not my_problems and thank %}
                         <form method="post">
                            {% if i['pub'] == 0 %}
-                            <button class="btn btn-outline-primary"  type="submit" name="th_0" value="{{ i['id'] }}">Присоединиться</button></form>
+                            <button class="btn btn-outline-primary"  type="submit" name="th_0" value="{{ i['id'] }}">Присоединиться</button>
                             {% elif i['pub'] == -1 %}
-                            <button class="btn btn-primary"  type="submit" name="th_1" value="{{ i['id'] }}">Вы присоединились</button></form>
+                            <button class="btn btn-primary"  type="submit" name="th_1" value="{{ i['id'] }}">Вы присоединились</button>
                             {% endif %}
-
+                            </form>
                         {% endif %}
                     </div>
                 </article>

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="../static/css/style.css"/>
+
     <title>{{title}}</title>
         <style>
     .cell {
@@ -19,8 +19,32 @@
     background: url(../static/img/fon.jpg);
     background-attachment: fixed;
     }
-    .link-header {
+    .top-menu {
     font-size: 14pt;
+    {% if current_user.is_authenticated %}
+    width: 72%;
+    {% else %}
+    width: 68%;
+    {% endif %}
+    float: none;
+    }
+    .top-menu ul li {
+    list-style: none;
+    float: left;
+    text-align: center;
+    }
+    .top-menu ul li a {
+    display: block;
+    wight: 800px;
+    text-decoration: none;
+    color: green;
+    padding-top: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    }
+    .top-menu ul li a:hover {
+    color: #fec239;
+    transition: all 0.5s ease;
     }
     .form-control {
     width: 30%; margin-left: auto; margin-right: auto;
@@ -35,35 +59,35 @@
     div.object-area { margin-left: auto; margin-right: auto; margin-top: 10%; width: 70%; color: white;
      padding: 50px 10px; background-color: rgba(28, 28, 28, 0); font-size: large; }
     img.centr { text-align: center; height: 50%; width: 50%; }
-    p.text-problem { text-align: left; padding: 10px 40px; }
-    .form-select { margin-left: 50%; margin-top: -4%; width: 300px; }
-    .empty-field { text-align: center; padding: 15px; }
+    p.text-problem { text-align: left; padding: 10px 40px;   }
+    #form-select { margin-left: 50%; margin-top: -4%; width: 300px; }
+    .empty-field { text-align: center; padding: 10%; background-color: rgb(28, 28, 28);}
+    div.fon-problem { padding: 10px; background-color: rgb(28, 28, 28); }
 </style>
 </head>
 <body>
 <header>
     <nav class="navbar navbar-dark bg-dark" style="height: 60px;">
         {% if current_user.is_authenticated %}
-        <p><a class="navbar-brand" href="/logout" style="position: absolute; left: 2%; top: 5px;">{{ current_user.name }} {{ current_user.surname }}</a></p>
+        <p><a class="navbar-brand" href="/logout" style="position: absolute; left: 2%; top: 5px; color: #fec239;">{{ current_user.name }} {{ current_user.surname }}</a></p>
         {% else %}
         <p>
             <a class="btn btn-outline-warning" href="/register" style="height: 35px; position: absolute; left: 1%; top: 10px;">Регистрация</a>
             <a class="btn btn-outline-success" href="/login" style="height: 35px; position: absolute; left: 8%; top: 10px;">Войти</a>
         </p>
         {% endif %}
-        <div class="link-header">
+        <div class="top-menu">
+            <ul>
+
+            <li><a class="nav-item nav-link active" href="/">Главная</a></li>
+        <li><a class="nav-item nav-link" href="/all_problems">Проблемы</a></li>
         {% if current_user.is_authenticated %}
-            <a class="nav-item nav-link active" href="/" style="position: absolute; top: 5px; left: 600px;">Главная</a>
-        <a class="nav-item nav-link" href="/all_problems" style="position: absolute; top: 5px; left: 700px;">Проблемы</a>
-        <a class="nav-item nav-link" href="/my_problems" style="position: absolute; top: 5px; left: 830px;">Мои проблемы</a>
-        <a class="nav-item nav-link" href="/all_thanks" style="position: absolute; top: 5px; left: 1000px;">Благодарности</a>
-        <a class="nav-item nav-link" href="/resolved_problems" style="position: absolute; top: 5px; left: 1150px;">Решённые проблемы</a>
-        {% else %}
-            <a class="nav-item nav-link active" href="/" style="position: absolute; top: 5px; left: 650px;">Главная</a>
-        <a class="nav-item nav-link" href="/all_problems" style="position: absolute; top: 5px; left: 750px;">Проблемы</a>
-            <a class="nav-item nav-link" href="/all_thanks" style="position: absolute; top: 5px; left: 870px;">Благодарности</a>
-            <a class="nav-item nav-link" href="/resolved_problems" style="margin-left: -305%; padding-top: 5px;">Решённые проблемы</a>
-        {% endif %}</div>
+        <li><a class="nav-item nav-link" href="/my_problems">Мои проблемы</a></li>
+        {% endif %}
+                <li><a class="nav-item nav-link" href="/all_thanks">Благодарности</a></li>
+                <li><a class="nav-item nav-link" href="/resolved_problems">Решённые проблемы</a></li>
+            </ul>
+        </div>
     </nav>
 </header>
 <!-- Begin page content -->
