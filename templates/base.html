@@ -2,94 +2,50 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
-          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.13.7/dist/css/uikit.min.css"/>
 
-    <title>{{title}}</title>
-        <style>
-    .cell {
-    background-color: rgb(45, 45, 45);
-    left: 23%;
-    padding: 10px;
-    border: 4px solid black;
-    margin-bottom: 15px;
-    }
-    body {
-    background: url(../static/img/fon.jpg);
-    background-attachment: fixed;
-    }
-    .top-menu {
-    font-size: 14pt;
-    {% if current_user.is_authenticated %}
-    width: 72%;
-    {% else %}
-    width: 68%;
-    {% endif %}
-    float: none;
-    }
-    .top-menu ul li {
-    list-style: none;
-    float: left;
-    text-align: center;
-    }
-    .top-menu ul li a {
-    display: block;
-    wight: 800px;
-    text-decoration: none;
-    color: green;
-    padding-top: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    }
-    .top-menu ul li a:hover {
-    color: #fec239;
-    transition: all 0.5s ease;
-    }
-    .form-control {
-    width: 30%; margin-left: auto; margin-right: auto;
-    }
-    p.button-register { text-align: center;}
-    p.title-form {text-align: center; font-weight: bold;}
-    p.message-form { color: rgb(255, 165, 0); font-size: 20pt; text-align: center; margin-top: 10%;}
-    h1.title {text-align: center;}
-    h1.title-map { margin-top: 3%; text-align: center; font-weight: bold;}
-    #map { margin-top: 5%; margin-left: auto; margin-right: auto; width: 70%; height: 600px; }
-    #form-category { text-align: center; margin-top: 4%;}
-    div.object-area { margin-left: auto; margin-right: auto; margin-top: 10%; width: 70%; color: white;
-     padding: 50px 10px; background-color: rgba(28, 28, 28, 0); font-size: large; }
-    img.centr { text-align: center; height: 50%; width: 50%; }
-    p.text-problem { text-align: left; padding: 10px 40px;   }
-    #form-select { margin-left: 50%; margin-top: -4%; width: 300px; }
-    .empty-field { text-align: center; padding: 10%; background-color: rgb(28, 28, 28);}
-    div.fon-problem { padding: 10px; background-color: rgb(28, 28, 28); }
-</style>
+    <!-- UIkit JS -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.13.7/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.13.7/dist/js/uikit-icons.min.js"></script>
+
+    <title>{{ title }}</title>
+    <style>
+
+        body {
+            background: url(../static/img/fon.jpg);
+            background-attachment: fixed;
+        }
+
+    </style>
 </head>
 <body>
-<header>
-    <nav class="navbar navbar-dark bg-dark" style="height: 60px;">
-        {% if current_user.is_authenticated %}
-        <p><a class="navbar-brand" href="/logout" style="position: absolute; left: 2%; top: 5px; color: #fec239;">{{ current_user.name }} {{ current_user.surname }}</a></p>
-        {% else %}
-        <p>
-            <a class="btn btn-outline-warning" href="/register" style="height: 35px; position: absolute; left: 1%; top: 10px;">Регистрация</a>
-            <a class="btn btn-outline-success" href="/login" style="height: 35px; position: absolute; left: 8%; top: 10px;">Войти</a>
-        </p>
-        {% endif %}
-        <div class="top-menu">
-            <ul>
+    <nav class="uk-navbar-container" uk-navbar>
 
-            <li><a class="nav-item nav-link active" href="/">Главная</a></li>
-        <li><a class="nav-item nav-link" href="/all_problems">Проблемы</a></li>
-        {% if current_user.is_authenticated %}
-        <li><a class="nav-item nav-link" href="/my_problems">Мои проблемы</a></li>
-        {% endif %}
-                <li><a class="nav-item nav-link" href="/all_thanks">Благодарности</a></li>
-                <li><a class="nav-item nav-link" href="/resolved_problems">Решённые проблемы</a></li>
+        <div class="uk-navbar-left">
+            {% if current_user.is_authenticated %}
+                <ul class="uk-navbar-nav">
+                    <li class="uk-active"><a href="/logout">{{ current_user.name }} {{ current_user.surname }}</a></li>
+                </ul>
+            {% else %}
+                <ul class="uk-navbar-nav">
+                    <li class="uk-active"><a href="/register">Регистрация</a></li>
+                    <li class="uk-active"><a href="/login">Войти</a></li>
+                </ul>
+                </div>
+            {% endif %}
+        <div class="uk-navbar-center">
+            <ul class="uk-navbar-nav">
+                <li class="uk-active"><a href="/">Главная</a></li>
+                <li class="uk-active"><a href="/all_problems">Проблемы</a></li>
+                {% if current_user.is_authenticated %}
+                    <li class="uk-active"><a href="/my_problems">Мои проблемы</a></li>
+                {% endif %}
+                <li class="uk-active"><a href="/all_thanks">Благодарности</a></li>
+                <li class="uk-active"><a href="/resolved_problems">Решённые проблемы</a></li>
             </ul>
         </div>
     </nav>
-</header>
 <!-- Begin page content -->
 <main role="main" class="container">
     {% block content %}{% endblock %}
